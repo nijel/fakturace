@@ -7,18 +7,16 @@ from fakturace.invoices import Invoice
 
 COMMANDS = {}
 
+
 def register_command(command):
     """Decorator to register command in command line interface."""
-    COMMANDS[command.name] = command
+    COMMANDS[command.__name__.lower()] = command
     return command
 
 
 class Command(object):
 
     """Basic command object."""
-
-    name = ''
-    description = ''
 
     def __init__(self, args, stdout=None):
         """Construct Command object."""
@@ -31,9 +29,7 @@ class Command(object):
     @classmethod
     def add_parser(cls, subparser):
         """Create parser for command line."""
-        return subparser.add_parser(
-            cls.name, description=cls.__doc__
-        )
+        return subparser.add_parser(cls.__name__.lower(), description=cls.__doc__)
 
     def run(self):
         """Main execution of the command."""
@@ -45,38 +41,37 @@ class List(Command):
 
     """List invoices."""
 
-    name = 'list'
-
     @classmethod
     def add_parser(cls, subparser):
         """Create parser for command line."""
         parser = super(List, cls).add_parser(subparser)
-        parser.add_argument(
-            'match',
-            nargs='?',
-            help='Match string to find'
-        )
+        parser.add_argument("match", nargs="?", help="Match string to find")
         return parser
 
     def run(self):
         """Main execution of the command."""
         total = 0
         match = self.args.match
-        for filename in sorted(glob.glob('data/*.ini')):
+        for filename in sorted(glob.glob("data/*.ini")):
             invoice = Invoice(filename)
-            if match and match not in invoice.invoice['item'].lower() and match not in invoice.invoice['contact'].lower():
+            if (
+                match
+                and match not in invoice.invoice["item"].lower()
+                and match not in invoice.invoice["contact"].lower()
+            ):
                 continue
-            print('{0}: {1} {2} ({4:.2f} CZK): {3}'.format(
-                invoice.invoiceid,
-                invoice.amount,
-                invoice.currency,
-                invoice.invoice['item'],
-                invoice.amount_czk,
-            ))
+            print(
+                "{0}: {1} {2} ({4:.2f} CZK): {3}".format(
+                    invoice.invoiceid,
+                    invoice.amount,
+                    invoice.currency,
+                    invoice.invoice["item"],
+                    invoice.amount_czk,
+                )
+            )
             total += invoice.amount_czk
         print()
-        print('Total: {0:.2f} CZK'.format(total))
-
+        print("Total: {0:.2f} CZK".format(total))
 
 
 def main(stdout=None, args=None):
