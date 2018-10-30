@@ -1,0 +1,57 @@
+#!/usr/bin/env python3
+
+from configparser import ConfigParser
+import sys
+import os
+import datetime
+
+TEMPLATE = '''[invoice]
+contact = {contact}
+date = {date}
+due = {due}
+
+rate = {rate}
+quantity = {quantity}
+item = {item}
+'''
+
+def create_file(name, contact, date, due):
+    data = ConfigParser()
+    data.read(
+        os.path.join(
+            'contacts',
+            '{0}.ini'.format(contact)
+        )
+    )
+    contact_data = dict(data['contact'])
+    content = TEMPLATE.format(
+        contact=contact,
+        date=date,
+        due=due,
+        rate=contact_data.get('default_rate', ''),
+        quantity=contact_data.get('default_quantity', ''),
+        item=contact_data.get('default_item', ''),
+    )
+    with open(name, 'w') as handle:
+        handle.write(content)
+
+
+def add_invoice(contact):
+    today = datetime.date.today()
+    prefix = today.strftime('%y%m')
+    filetemplate = 'data/{0}{1:02d}.ini'
+    
+    for i in range(1, 100):
+        filename = filetemplate.format(
+            prefix, i
+        )
+        if os.path.exists(filename):
+            continue
+        create_file(filename, contact, today, today + datetime.timedelta(days=30))
+        print(filename)
+        return
+
+    sys.exit(1)
+    
+if __name__ == '__main__':
+    add_invoice(sys.argv[1])

@@ -1,0 +1,45 @@
+#! /usr/bin/env python3
+
+import glob
+import datetime
+import sys
+import os.path
+import invoices
+
+
+
+def main(invoice):
+    filename = 'data/{0}.ini'.format(invoice)
+    invoice = invoices.Invoice(filename)
+    print(invoice.invoiceid)
+    print('-' * len(invoice.invoiceid))
+    print('Date:     ', invoice.invoice['date'])
+    print('Due:      ', invoice.invoice['due'])
+    print('Name:     ', invoice.contact['name'])
+    print('Item:     ', invoice.invoice['item'])
+    print('Category: ', invoice.invoice['category'])
+    print('Rate:      {0} {1}'.format(
+        invoice.rate,
+        invoice.currency
+    ))
+    print('Quantity:  {0}'.format(
+        invoice.quantity,
+    ))
+    print('Amount:    {0} {1}'.format(
+        invoice.amount,
+        invoice.currency
+    ))
+    if invoice.currency != 'CZK':
+        print('Amount:    {0:.2f} CZK'.format(
+            invoice.amount_czk,
+        ))
+    if invoice.paid():
+        print('Paid:      yes')
+    else:
+        print('Paid:      no')
+
+
+if __name__ == '__main__':
+    main(*sys.argv[1:])
+
+

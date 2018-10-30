@@ -1,0 +1,13 @@
+#! /usr/bin/env python3
+
+import sys
+
+import invoices
+
+def main(data, tex):
+    writer = invoices.Invoice(data)
+    writer.output(tex)
+
+
+if __name__ == '__main__':
+    main(*sys.argv[1:])

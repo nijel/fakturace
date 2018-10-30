@@ -1,0 +1,55 @@
+#! /usr/bin/env python3
+
+import glob
+import datetime
+import sys
+import os.path
+import invoices
+import argparse
+
+
+def main(year=None, summary=False):
+    if year is None:
+        year = datetime.date.today().year
+    else:
+        year = int(year)
+
+    supertotal = 0
+    supercats = {x: 0 for x in invoices.CATEGORIES}
+    catformat = ' '.join(('{{{0}:7.0f}} CZK'.format(x) for x in invoices.CATEGORIES))
+    header = 'Month         Total {0}'.format(' '.join(('{0:>11}'.format(x.title()) for x in invoices.CATEGORIES)))
+    print(header)
+    print('-' * len(header))
+    for month in range (1, 13):
+        mask = 'data/{0}{1:02d}*.ini'.format(year % 2000, month)
+        total = 0
+        cats = {x: 0 for x in invoices.CATEGORIES}
+        for filename in glob.glob(mask):
+            invoice = invoices.Invoice(filename)
+            cats[invoice.category] += invoice.amount_czk
+            supercats[invoice.category] += invoice.amount_czk
+            total += invoice.amount_czk
+            supertotal += invoice.amount_czk
+        if summary:
+            print('{0}/{1:02d} {2:7.0f} CZK {3}'.format(year, month, supertotal, catformat.format(**supercats)))
+        else:
+            print('{0}/{1:02d} {2:7.0f} CZK {3}'.format(year, month, total, catformat.format(**cats)))
+    print('-' * len(header))
+    print('Summary {0:7.0f} CZK {1}'.format(supertotal, catformat.format(**supercats)))
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Show invoices summary.')
+    parser.add_argument(
+        'year', 
+        type=int,
+        help='year to process',
+        nargs='?'
+    )
+    parser.add_argument(
+        '--sum', '-s',
+        action='store_true',
+        help='show YTD sum',
+    )
+    args = parser.parse_args()
+    main(year=args.year, summary=args.sum)
