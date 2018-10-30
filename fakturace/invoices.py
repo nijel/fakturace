@@ -1,26 +1,13 @@
+# -*- coding: utf-8 -*-
 import json
 import os
 from string import Template
 from configparser import ConfigParser
 from urllib.request import urlopen
 
-DEFAULTS = {
-    'quantity': '1',
-    'currency': 'EUR',
-    'currency_note': '',
-    'note': '',
-    'category': 'none',
-    'template': 'template/invoice.tex',
-    'row': 'template/row.tex',
-}
-CONTACT = {
-    'vat_reg': '',
-    'tax_reg': '',
-}
-RATE_URL = 'http://www.cnb.cz/cs/financni_trhy/devizovy_trh/kurzy_devizoveho_trhu/denni_kurz.txt?date={2}.{1}.{0}'
+from fakturace.data import DEFAULTS, CONTACT, RATE_URL, CACHE_DIR
 CATEGORIES = (
 )
-CACHE_DIR = os.path.expanduser('~/.cache/fakturace')
 
 
 class Rates(object):
