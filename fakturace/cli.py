@@ -1,5 +1,6 @@
 from argparse import ArgumentParser
 import datetime
+import subprocess
 
 from fakturace.storage import InvoiceStorage, QuoteStorage, WebStorage
 
@@ -214,11 +215,15 @@ class Add(Command):
     def add_parser(cls, subparser):
         """Create parser for command line."""
         parser = super().add_parser(subparser)
+        parser.add_argument("--edit", "-e", action="store_true", help="open in editor")
         parser.add_argument("contact", help="Contact name")
         return parser
 
     def run(self):
-        print(self.storage.create(self.args.contact))
+        filename = self.storage.create(self.args.contact)
+        print(filename)
+        if self.args.edit:
+            subprocess.run(['gvim', filename])
 
 
 def main(args=None):
