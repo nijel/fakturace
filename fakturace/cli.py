@@ -2,7 +2,7 @@ from argparse import ArgumentParser
 import sys
 import datetime
 
-from fakturace.storage import InvoiceStorage, QuoteStorage
+from fakturace.storage import InvoiceStorage, QuoteStorage, WebStorage
 
 
 COMMANDS = {}
@@ -27,6 +27,8 @@ class Command(object):
             self.stdout = stdout
         if args.quotes:
             self.storage = QuoteStorage()
+        elif args.web:
+            self.storage = WebStorage()
         else:
             self.storage = InvoiceStorage()
 
@@ -220,6 +222,7 @@ def main(stdout=None, args=None):
     parser.add_argument(
         "--quotes", action="store_true", help="Operate on quotes instead of invoices"
     )
+    parser.add_argument("--web", action="store_true", help="Operate on web invoices")
 
     subparser = parser.add_subparsers(dest="cmd")
     for command in COMMANDS:

@@ -12,6 +12,10 @@ class InvoiceStorage:
     pdf = "pdf"
     tex = "tex"
     config = "config"
+    contacts = "contacts"
+
+    template = "{year}{month}{order}.ini"
+    order = "{:02d}"
 
     base = Invoice
 
@@ -23,15 +27,15 @@ class InvoiceStorage:
 
     def glob(self, year=None, month=None):
         if year:
-            if year > 2000:
-                year = year - 2000
-            if month:
-                mask = "{:02d}{:02d}*".format(year, month)
-            else:
-                mask = "{:02d}*".format(year)
+            year = "{:02d}".format(year % 2000)
         else:
-            mask = "*"
-        return sorted(glob(self.path(self.data, "{}.ini".format(mask))))
+            year = "[0-9][0-9]"
+        if month:
+            month = "{:02d}".format(month)
+        else:
+            month = "[0-9][0-9]"
+        mask = self.template.format(year=year, month=month, order="*")
+        return sorted(glob(self.path(self.data, mask)))
 
     def list(self, year=None, month=None):
         for filename in self.glob(year, month):
@@ -53,3 +57,8 @@ class QuoteStorage(InvoiceStorage):
     tex = "quotes"
 
     base = Quote
+
+
+class WebStorage(InvoiceStorage):
+    template = "W{year}{month}{order}.ini"
+    order = "{:03d}"
