@@ -74,6 +74,40 @@ class List(Command):
         print("Total: {0:.2f} CZK".format(total))
 
 
+@register_command
+class Detail(Command):
+
+    """Show invoice detail."""
+
+    @classmethod
+    def add_parser(cls, subparser):
+        """Create parser for command line."""
+        parser = super(Detail, cls).add_parser(subparser)
+        parser.add_argument("id", help="Invoice id")
+        return parser
+
+    def run(self):
+        """Main execution of the command."""
+        filename = "data/{0}.ini".format(self.args.id)
+        invoice = Invoice(filename)
+        print(invoice.invoiceid)
+        print("-" * len(invoice.invoiceid))
+        print("Date:     ", invoice.invoice["date"])
+        print("Due:      ", invoice.invoice["due"])
+        print("Name:     ", invoice.contact["name"])
+        print("Item:     ", invoice.invoice["item"])
+        print("Category: ", invoice.invoice["category"])
+        print("Rate:      {0} {1}".format(invoice.rate, invoice.currency))
+        print("Quantity:  {0}".format(invoice.quantity))
+        print("Amount:    {0} {1}".format(invoice.amount, invoice.currency))
+        if invoice.currency != "CZK":
+            print("Amount:    {0:.2f} CZK".format(invoice.amount_czk))
+        if invoice.paid():
+            print("Paid:      yes")
+        else:
+            print("Paid:      no")
+
+
 def main(stdout=None, args=None):
     """Execution entry point."""
     stdout = stdout if stdout is not None else sys.stdout
