@@ -32,10 +32,10 @@ class InvoiceStorage:
 
     def list(self, year=None, month=None):
         for filename in self.glob(year, month):
-            yield Invoice(filename)
+            yield Invoice(self, filename)
 
     def get(self, invoice):
-        return Invoice(self.path("data", "{}.ini".format(invoice)))
+        return Invoice(self, self.path("data", "{}.ini".format(invoice)))
 
     @cached_property
     def config(self):
@@ -45,8 +45,9 @@ class InvoiceStorage:
 
 
 class Invoice(object):
-    def __init__(self, data, override=None):
+    def __init__(self, storage, data, override=None):
         self.name = data
+        self.storage = storage
         self.contact = {}
         self.invoice = {}
         self.bank = {}
@@ -182,8 +183,9 @@ class Invoice(object):
 
 
 class Quote(Invoice):
-    def __init__(self, data):
+    def __init__(self, storage, data):
         super().__init__(
+            storage,
             data,
             {
                 "template": "template/quote.tex",
