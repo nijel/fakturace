@@ -46,7 +46,7 @@ class List(Command):
     @classmethod
     def add_parser(cls, subparser):
         """Create parser for command line."""
-        parser = super(List, cls).add_parser(subparser)
+        parser = super().add_parser(subparser)
         parser.add_argument(
             "--year",
             type=int,
@@ -62,8 +62,8 @@ class List(Command):
             return True
         match = self.args.match.lower()
         return (
-                match in invoice.invoice["item"].lower()
-                or match in invoice.invoice["contact"].lower()
+            match in invoice.invoice["item"].lower()
+            or match in invoice.invoice["contact"].lower()
         )
 
     def run(self):
@@ -91,6 +91,7 @@ class List(Command):
 class NotPaid(List):
 
     """Not paid invoices."""
+
     def match(self, invoice):
         return not invoice.paid() and super().match(invoice)
 
@@ -103,7 +104,7 @@ class Detail(Command):
     @classmethod
     def add_parser(cls, subparser):
         """Create parser for command line."""
-        parser = super(Detail, cls).add_parser(subparser)
+        parser = super().add_parser(subparser)
         parser.add_argument("id", help="Invoice id")
         return parser
 
