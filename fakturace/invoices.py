@@ -2,6 +2,7 @@
 from glob import glob
 import os
 from string import Template
+from subprocess import Popen
 from configparser import ConfigParser
 
 from fakturace.data import DEFAULTS, CONTACT
@@ -141,11 +142,15 @@ class Invoice(object):
             if key not in self.contact:
                 self.contact[key] = CONTACT[key]
 
-    @property
+    @cached_property
     def invoiceid(self):
         return os.path.splitext(os.path.basename(self.name))[0]
 
-    def output(self, filename):
+    @cached_property
+    def tex_path(self):
+        return self.storage.path(self.storage.tex, "{}.tex".format(self.invoiceid))
+
+    def write_tex(self):
         with open(self.invoice["row"], "r") as handle:
             row_template = Template(handle.read())
 
@@ -161,8 +166,15 @@ class Invoice(object):
         context.update(self.invoice)
         context.update(self.bank)
         output = template.substitute(context)
-        with open(filename, "w") as handle:
+        with open(self.tex_path, "w") as handle:
             handle.write(output)
+
+    def build_pdf(self):
+        cmd = Popen(
+            ["pdflatex", os.path.abspath(self.tex_path)],
+            cwd=self.storage.path(self.storage.pdf),
+        )
+        cmd.communicate()
 
     @property
     def category(self):

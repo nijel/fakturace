@@ -128,6 +128,28 @@ class Detail(Command):
 
 
 @register_command
+class WriteTex(Detail):
+
+    """Generate tex."""
+
+    def run(self):
+        """Main execution of the command."""
+        invoice = self.storage.get(self.args.id)
+        invoice.write_tex()
+
+
+@register_command
+class BuildPDF(Detail):
+
+    """Build PDF."""
+
+    def run(self):
+        """Main execution of the command."""
+        invoice = self.storage.get(self.args.id)
+        invoice.build_pdf()
+
+
+@register_command
 class Summary(Command):
 
     """Show invoice summary."""
