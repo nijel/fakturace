@@ -47,19 +47,31 @@ class List(Command):
     def add_parser(cls, subparser):
         """Create parser for command line."""
         parser = super(List, cls).add_parser(subparser)
+        parser.add_argument(
+            "--year",
+            type=int,
+            nargs="?",
+            help="Year to process",
+            default=datetime.date.today().year,
+        )
         parser.add_argument("match", nargs="?", help="Match string to find")
         return parser
+
+    def match(self, invoice):
+        if not self.args.match:
+            return True
+        match = self.args.match.lower()
+        return (
+                match in invoice.invoice["item"].lower()
+                or match in invoice.invoice["contact"].lower()
+        )
 
     def run(self):
         """Main execution of the command."""
         total = 0
         match = self.args.match
-        for invoice in self.storage.list():
-            if (
-                match
-                and match not in invoice.invoice["item"].lower()
-                and match not in invoice.invoice["contact"].lower()
-            ):
+        for invoice in self.storage.list(self.args.year):
+            if not self.match(invoice):
                 continue
             print(
                 "{0}: {1} {2} ({4:.2f} CZK): {3}".format(
@@ -76,32 +88,11 @@ class List(Command):
 
 
 @register_command
-class NotPaid(Command):
+class NotPaid(List):
 
     """Not paid invoices."""
-
-    @classmethod
-    def add_parser(cls, subparser):
-        """Create parser for command line."""
-        parser = super(NotPaid, cls).add_parser(subparser)
-        parser.add_argument(
-            "year",
-            type=int,
-            nargs="?",
-            help="Year to process",
-            default=datetime.date.today().year,
-        )
-        return parser
-
-    def run(self):
-        supertotal = 0
-        for invoice in self.storage.list(self.args.year):
-            if not invoice.paid():
-                print(
-                    "{0}: {1} {2}".format(
-                        invoice.invoiceid, invoice.amount, invoice.currency
-                    )
-                )
+    def match(self, invoice):
+        return not invoice.paid() and super().match(invoice)
 
 
 @register_command
