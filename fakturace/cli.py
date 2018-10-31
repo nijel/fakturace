@@ -1,5 +1,4 @@
 from argparse import ArgumentParser
-import sys
 import datetime
 
 from fakturace.storage import InvoiceStorage, QuoteStorage, WebStorage
@@ -18,13 +17,9 @@ class Command(object):
 
     """Basic command object."""
 
-    def __init__(self, args, stdout=None):
+    def __init__(self, args):
         """Construct Command object."""
         self.args = args
-        if stdout is None:
-            self.stdout = sys.stdout
-        else:
-            self.stdout = stdout
         if args.quotes:
             self.storage = QuoteStorage()
         elif args.web:
@@ -226,9 +221,8 @@ class Add(Command):
         print(self.storage.create(self.args.contact))
 
 
-def main(stdout=None, args=None):
+def main(args=None):
     """Execution entry point."""
-    stdout = stdout if stdout is not None else sys.stdout
 
     parser = ArgumentParser(
         description="Fakturace.",
@@ -247,7 +241,7 @@ def main(stdout=None, args=None):
 
     params = parser.parse_args(args)
 
-    command = COMMANDS[params.cmd](params, stdout)
+    command = COMMANDS[params.cmd](params)
     command.run()
 
 
