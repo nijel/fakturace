@@ -3,7 +3,7 @@ import glob
 import sys
 import datetime
 
-from fakturace.invoices import Invoice
+from fakturace.invoices import Invoice, InvoiceStorage
 
 
 COMMANDS = {}
@@ -26,6 +26,7 @@ class Command(object):
             self.stdout = sys.stdout
         else:
             self.stdout = stdout
+        self.storage = InvoiceStorage()
 
     @classmethod
     def add_parser(cls, subparser):
@@ -53,8 +54,7 @@ class List(Command):
         """Main execution of the command."""
         total = 0
         match = self.args.match
-        for filename in sorted(glob.glob("data/*.ini")):
-            invoice = Invoice(filename)
+        for invoice in self.storage.list():
             if (
                 match
                 and match not in invoice.invoice["item"].lower()
@@ -94,15 +94,8 @@ class NotPaid(Command):
         return parser
 
     def run(self):
-        year = self.args.year
-
-        if year > 2000:
-            year = year - 2000
-
         supertotal = 0
-        mask = "data/{0}*.ini".format(year)
-        for filename in sorted(glob.glob(mask)):
-            invoice = Invoice(filename)
+        for invoice in self.storage.list(self.args.year):
             if not invoice.paid():
                 print(
                     "{0}: {1} {2}".format(
@@ -125,8 +118,7 @@ class Detail(Command):
 
     def run(self):
         """Main execution of the command."""
-        filename = "data/{0}.ini".format(self.args.id)
-        invoice = Invoice(filename)
+        invoice = self.storage.get(self.args.id)
         print(invoice.invoiceid)
         print("-" * len(invoice.invoiceid))
         print("Date:     ", invoice.invoice["date"])

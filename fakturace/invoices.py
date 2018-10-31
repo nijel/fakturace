@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import json
+from glob import glob
 import os
 from string import Template
 from configparser import ConfigParser
@@ -8,6 +9,26 @@ from urllib.request import urlopen
 from fakturace.data import DEFAULTS, CONTACT, RATE_URL, CACHE_DIR
 CATEGORIES = (
 )
+
+class InvoiceStorage():
+    def __init__(self, datadir='data'):
+        self.datadir = datadir
+
+    def glob(self, year=None):
+        if year:
+            if year > 2000:
+                year = year - 2000
+            mask = '{:02d}*'.format(year)
+        else:
+            mask = '*'
+        return sorted(glob("{}/{}.ini".format(self.datadir, mask)))
+
+    def list(self, year=None):
+        for filename in self.glob(year=year):
+            yield Invoice(filename)
+
+    def get(self, invoice):
+        return  Invoice("{}/{}.ini".format(self.datadir, invoice))
 
 
 class Rates(object):
