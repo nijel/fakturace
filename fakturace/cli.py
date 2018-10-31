@@ -145,7 +145,6 @@ class Summary(Command):
             default=datetime.date.today().year,
         )
         parser.add_argument("--summary", "-s", action="store_true", help="show YTD sum")
-        parser.add_argument("match", nargs="?", help="Match string to find")
         return parser
 
     def run(self):
