@@ -1,6 +1,7 @@
 from argparse import ArgumentParser
 import glob
 import sys
+import datetime
 
 from fakturace.invoices import Invoice
 
@@ -72,6 +73,42 @@ class List(Command):
             total += invoice.amount_czk
         print()
         print("Total: {0:.2f} CZK".format(total))
+
+
+@register_command
+class NotPaid(Command):
+
+    """Not paid invoices."""
+
+    @classmethod
+    def add_parser(cls, subparser):
+        """Create parser for command line."""
+        parser = super(NotPaid, cls).add_parser(subparser)
+        parser.add_argument(
+            "year",
+            type=int,
+            nargs="?",
+            help="Year to process",
+            default=datetime.date.today().year,
+        )
+        return parser
+
+    def run(self):
+        year = self.args.year
+
+        if year > 2000:
+            year = year - 2000
+
+        supertotal = 0
+        mask = "data/{0}*.ini".format(year)
+        for filename in sorted(glob.glob(mask)):
+            invoice = Invoice(filename)
+            if not invoice.paid():
+                print(
+                    "{0}: {1} {2}".format(
+                        invoice.invoiceid, invoice.amount, invoice.currency
+                    )
+                )
 
 
 @register_command
