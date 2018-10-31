@@ -129,6 +129,62 @@ class Detail(Command):
             print("Paid:      no")
 
 
+@register_command
+class Summary(Command):
+
+    """Show invoice summary."""
+
+    @classmethod
+    def add_parser(cls, subparser):
+        parser = super().add_parser(subparser)
+        parser.add_argument(
+            "--year",
+            type=int,
+            nargs="?",
+            help="Year to process",
+            default=datetime.date.today().year,
+        )
+        parser.add_argument("--summary", "-s", action="store_true", help="show YTD sum")
+        parser.add_argument("match", nargs="?", help="Match string to find")
+        return parser
+
+    def run(self):
+        categories = self.storage.config["categories"].split(",")
+        supertotal = 0
+        year = self.args.year
+        supercats = {x: 0 for x in categories}
+        catformat = " ".join(("{{{0}:7.0f}} CZK".format(x) for x in categories))
+        header = "Month         Total {0}".format(
+            " ".join(("{0:>11}".format(x.title()) for x in categories))
+        )
+        print(header)
+        print("-" * len(header))
+        for month in range(1, 13):
+            total = 0
+            cats = {x: 0 for x in categories}
+            for invoice in self.storage.list(year, month):
+                cats[invoice.category] += invoice.amount_czk
+                supercats[invoice.category] += invoice.amount_czk
+                total += invoice.amount_czk
+                supertotal += invoice.amount_czk
+            if self.args.summary:
+                print(
+                    "{0}/{1:02d} {2:7.0f} CZK {3}".format(
+                        year, month, supertotal, catformat.format(**supercats)
+                    )
+                )
+            else:
+                print(
+                    "{0}/{1:02d} {2:7.0f} CZK {3}".format(
+                        year, month, total, catformat.format(**cats)
+                    )
+                )
+        print("-" * len(header))
+        print(
+            "Summary {0:7.0f} CZK {1}".format(supertotal, catformat.format(**supercats))
+        )
+
+
 def main(stdout=None, args=None):
     """Execution entry point."""
     stdout = stdout if stdout is not None else sys.stdout
@@ -148,3 +204,7 @@ def main(stdout=None, args=None):
 
     command = COMMANDS[params.cmd](params, stdout)
     command.run()
+
+
+if __name__ == "__main__":
+    main()

@@ -6,29 +6,42 @@ from configparser import ConfigParser
 
 from fakturace.data import DEFAULTS, CONTACT
 from fakturace.rates import Rates
+from fakturace.utils import cached_property
 
 CATEGORIES = ()
 
 
 class InvoiceStorage:
-    def __init__(self, datadir="data"):
-        self.datadir = datadir
+    def __init__(self, basedir="."):
+        self.basedir = basedir
 
-    def glob(self, year=None):
+    def path(self, *args):
+        return os.path.join(self.basedir, *args)
+
+    def glob(self, year=None, month=None):
         if year:
             if year > 2000:
                 year = year - 2000
-            mask = "{:02d}*".format(year)
+            if month:
+                mask = "{:02d}{:02d}*".format(year, month)
+            else:
+                mask = "{:02d}*".format(year)
         else:
             mask = "*"
-        return sorted(glob("{}/{}.ini".format(self.datadir, mask)))
+        return sorted(glob(self.path("data", "{}.ini".format(mask))))
 
-    def list(self, year=None):
-        for filename in self.glob(year=year):
+    def list(self, year=None, month=None):
+        for filename in self.glob(year, month):
             yield Invoice(filename)
 
     def get(self, invoice):
-        return Invoice("{}/{}.ini".format(self.datadir, invoice))
+        return Invoice(self.path("data", "{}.ini".format(invoice)))
+
+    @cached_property
+    def config(self):
+        data = ConfigParser()
+        data.read(self.path("config", "config.ini"))
+        return dict(data["config"])
 
 
 class Invoice(object):
