@@ -4,6 +4,8 @@ from glob import glob
 import os
 from configparser import ConfigParser
 
+from filelock import FileLock
+
 from fakturace.invoices import Invoice, Quote
 from fakturace.utils import cached_property
 
@@ -22,6 +24,7 @@ class InvoiceStorage:
 
     def __init__(self, basedir="."):
         self.basedir = basedir
+        self.lock = FileLock(self.path(self.config, "lock"))
 
     def path(self, *args):
         return os.path.join(self.basedir, *args)
@@ -68,32 +71,32 @@ class InvoiceStorage:
         raise ValueError("Failed to find invoice number!")
 
     def create(self, contact, duedelta=30, **kwargs):
-        # TODO: lock
-        today = datetime.date.today()
-        due = today + datetime.timedelta(days=duedelta)
-        filename = self.find_filename()
-        invoice = ConfigParser()
-        invoice.add_section("invoice")
-        invoice.set("invoice", "contact", contact)
-        invoice.set("invoice", "date", today.isoformat())
-        invoice.set("invoice", "due", due.isoformat())
-        # Apply defaults from contact
-        contact = self.read_contact(contact)
-        for key, value in contact.items():
-            if not key.startswith("default_"):
-                continue
-            invoice.set("invoice", key[8:], value)
-        # Apply passed value
-        for key, value in kwargs.items():
-            invoice.set("invoice", key, value)
-        # Ensure rate and item are present
-        for key in ("rate", "item"):
-            if not invoice.has_option("invoice", key):
-                invoice.set("invoice", key, "")
-        # Store the file
-        with open(filename, "w") as handle:
-            invoice.write(handle)
-        return filename
+        with self.lock:
+            today = datetime.date.today()
+            due = today + datetime.timedelta(days=duedelta)
+            filename = self.find_filename()
+            invoice = ConfigParser()
+            invoice.add_section("invoice")
+            invoice.set("invoice", "contact", contact)
+            invoice.set("invoice", "date", today.isoformat())
+            invoice.set("invoice", "due", due.isoformat())
+            # Apply defaults from contact
+            contact = self.read_contact(contact)
+            for key, value in contact.items():
+                if not key.startswith("default_"):
+                    continue
+                invoice.set("invoice", key[8:], value)
+            # Apply passed value
+            for key, value in kwargs.items():
+                invoice.set("invoice", key, value)
+            # Ensure rate and item are present
+            for key in ("rate", "item"):
+                if not invoice.has_option("invoice", key):
+                    invoice.set("invoice", key, "")
+            # Store the file
+            with open(filename, "w") as handle:
+                invoice.write(handle)
+            return filename
 
     def read_contact(self, name):
         data = ConfigParser()
