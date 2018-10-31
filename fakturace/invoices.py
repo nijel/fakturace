@@ -12,6 +12,11 @@ CATEGORIES = ()
 
 
 class InvoiceStorage:
+    data = "data"
+    pdf = "pdf"
+    tex = "tex"
+    config = "config"
+
     def __init__(self, basedir="."):
         self.basedir = basedir
 
@@ -28,20 +33,26 @@ class InvoiceStorage:
                 mask = "{:02d}*".format(year)
         else:
             mask = "*"
-        return sorted(glob(self.path("data", "{}.ini".format(mask))))
+        return sorted(glob(self.path(self.data, "{}.ini".format(mask))))
 
     def list(self, year=None, month=None):
         for filename in self.glob(year, month):
             yield Invoice(self, filename)
 
     def get(self, invoice):
-        return Invoice(self, self.path("data", "{}.ini".format(invoice)))
+        return Invoice(self, self.path(self.data, "{}.ini".format(invoice)))
 
     @cached_property
-    def config(self):
+    def settings(self):
         data = ConfigParser()
-        data.read(self.path("config", "config.ini"))
+        data.read(self.path(self.config, "config.ini"))
         return dict(data["config"])
+
+
+class QuoteStorage(InvoiceStorage):
+    data = "quotes"
+    pdf = "quotes"
+    tex = "quotes"
 
 
 class Invoice(object):
@@ -132,7 +143,7 @@ class Invoice(object):
 
     @property
     def invoiceid(self):
-        return self.name.replace("data/", "").replace(".ini", "")
+        return os.path.splitext(os.path.basename(self.name))[0]
 
     def output(self, filename):
         with open(self.invoice["row"], "r") as handle:
@@ -192,7 +203,3 @@ class Quote(Invoice):
                 "note": "If you have any questions concerning this quotation, contact Michal Čihař, michal@cihar.com.",
             },
         )
-
-    @property
-    def invoiceid(self):
-        return self.name.replace("quotes/", "").replace(".ini", "")

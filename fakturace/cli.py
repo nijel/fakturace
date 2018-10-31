@@ -146,7 +146,7 @@ class Summary(Command):
         return parser
 
     def run(self):
-        categories = self.storage.config["categories"].split(",")
+        categories = self.storage.settings["categories"].split(",")
         supertotal = 0
         year = self.args.year
         supercats = {x: 0 for x in categories}
