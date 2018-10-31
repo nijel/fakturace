@@ -2,7 +2,7 @@ from argparse import ArgumentParser
 import sys
 import datetime
 
-from fakturace.invoices import InvoiceStorage
+from fakturace.storage import InvoiceStorage, QuoteStorage
 
 
 COMMANDS = {}
@@ -25,7 +25,10 @@ class Command(object):
             self.stdout = sys.stdout
         else:
             self.stdout = stdout
-        self.storage = InvoiceStorage()
+        if args.quotes:
+            self.storage = QuoteStorage()
+        else:
+            self.storage = InvoiceStorage()
 
     @classmethod
     def add_parser(cls, subparser):
@@ -213,6 +216,9 @@ def main(stdout=None, args=None):
         epilog="This utility is developed at <{0}>.".format(
             "https://github.com/nijel/fakturace"
         ),
+    )
+    parser.add_argument(
+        "--quotes", action="store_true", help="Operate on quotes instead of invoices"
     )
 
     subparser = parser.add_subparsers(dest="cmd")
