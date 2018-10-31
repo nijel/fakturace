@@ -1,9 +1,8 @@
 from argparse import ArgumentParser
-import glob
 import sys
 import datetime
 
-from fakturace.invoices import Invoice, InvoiceStorage
+from fakturace.invoices import InvoiceStorage
 
 
 COMMANDS = {}
@@ -69,7 +68,6 @@ class List(Command):
     def run(self):
         """Main execution of the command."""
         total = 0
-        match = self.args.match
         for invoice in self.storage.list(self.args.year):
             if not self.match(invoice):
                 continue
