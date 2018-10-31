@@ -209,6 +209,23 @@ class Summary(Command):
         )
 
 
+@register_command
+class Add(Command):
+    """
+    Create new invoice.
+    """
+
+    @classmethod
+    def add_parser(cls, subparser):
+        """Create parser for command line."""
+        parser = super().add_parser(subparser)
+        parser.add_argument("contact", help="Contact name")
+        return parser
+
+    def run(self):
+        print(self.storage.create(self.args.contact))
+
+
 def main(stdout=None, args=None):
     """Execution entry point."""
     stdout = stdout if stdout is not None else sys.stdout
