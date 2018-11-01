@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
-from subprocess import Popen
+import subprocess
 from configparser import ConfigParser
 
 from fakturace.data import DEFAULTS, CONTACT
@@ -125,11 +125,11 @@ class Invoice(object):
             handle.write(output)
 
     def build_pdf(self):
-        cmd = Popen(
+        subprocess.run(
             ["pdflatex", os.path.abspath(self.tex_path)],
+            check=True,
             cwd=self.storage.path(self.storage.pdf),
         )
-        cmd.communicate()
 
     @property
     def category(self):
