@@ -131,10 +131,53 @@ class InvoiceStorage:
                 invoice.write(handle)
             return filename
 
-    def read_contact(self, name):
+    def contact_path(self, name):
+        return self.path(self.contacts, "{0}.ini".format(name))
+
+    def parse_contact(self, name):
         data = ConfigParser()
-        data.read(self.path(self.contacts, "{0}.ini".format(name)))
+        data.read(self.contact_path(name))
+        return data
+
+    def read_contact(self, name):
+        data = self.parse_contact(name)
         return dict(data["contact"])
+
+    def update_contact(
+        self,
+        key,
+        name,
+        address,
+        city,
+        country,
+        email,
+        tax_reg,
+        vat_reg,
+        default_currency,
+        default_category,
+    ):
+        filename = self.contact_path(key)
+        if os.path.exists(filename):
+            contact = self.parse_contact(key)
+        else:
+            contact = ConfigParser()
+
+        if not contact.has_section("contact"):
+            contact.add_section("contact")
+
+        contact.set("contact", "name", name)
+        contact.set("contact", "address", address)
+        contact.set("contact", "city", city)
+        contact.set("contact", "country", country)
+        contact.set("contact", "email", email)
+        contact.set("contact", "tax_reg", tax_reg)
+        contact.set("contact", "vat_reg", vat_reg)
+        contact.set("contact", "default_currency", default_currency)
+        contact.set("contact", "default_category", default_category)
+
+        with open(filename, "w") as handle:
+            contact.write(handle)
+        return filename
 
 
 class QuoteStorage(InvoiceStorage):

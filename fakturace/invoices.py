@@ -68,8 +68,8 @@ class Invoice(object):
 
         # Calculate VAT
         total = float(self.invoice["total"])
-        if int(self.invoice['vat']):
-            vat = round(int(self.invoice['vat']) * total / 100, 2)
+        if int(self.invoice["vat"]):
+            vat = round(int(self.invoice["vat"]) * total / 100, 2)
             self.invoice["total_vat"] = "{0:.2f}".format(vat)
             self.invoice["total_sum"] = "{0:.2f}".format(total + vat)
 
