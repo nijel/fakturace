@@ -80,7 +80,7 @@ class InvoiceStorage:
             yield self.base(self, filename)
 
     def get(self, invoice):
-        if '/' not in invoice:
+        if "/" not in invoice:
             return self.base(self, self.path(self.data, "{}.ini".format(invoice)))
         return self.base(self, self.path(invoice))
 

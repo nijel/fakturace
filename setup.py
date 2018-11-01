@@ -24,7 +24,5 @@ setup(
         "Intended Audience :: Developers",
         "Programming Language :: Python :: 3",
     ],
-    entry_points={
-        "console_scripts": ["fakturace = fakturace.cli:main"]
-    },
+    entry_points={"console_scripts": ["fakturace = fakturace.cli:main"]},
 )
