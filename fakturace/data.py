@@ -8,6 +8,7 @@ DEFAULTS = {
     'category': 'none',
     'template': 'template/invoice.tex',
     'row': 'template/row.tex',
+    'vat': '0',
 }
 CONTACT = {
     'vat_reg': '',

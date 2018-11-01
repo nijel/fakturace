@@ -40,7 +40,7 @@ class Invoice(object):
 
         self.bank = dict(data["bank"])
         # Propagate defaults from bank
-        for field in ("template", "note"):
+        for field in ("template", "note", "vat"):
             if field in self.bank:
                 self.invoice[field] = self.bank[field]
 
@@ -68,9 +68,10 @@ class Invoice(object):
 
         # Calculate VAT
         total = float(self.invoice["total"])
-        vat = round(0.21 * total, 2)
-        self.invoice["total_vat"] = "{0:.2f}".format(vat)
-        self.invoice["total_sum"] = "{0:.2f}".format(total + vat)
+        if int(self.invoice['vat']):
+            vat = round(int(self.invoice['vat']) * total / 100, 2)
+            self.invoice["total_vat"] = "{0:.2f}".format(vat)
+            self.invoice["total_sum"] = "{0:.2f}".format(total + vat)
 
         # Shorter summary for PDF title
         self.invoice["shortitem"] = self.invoice["item"].split(":")[0]
