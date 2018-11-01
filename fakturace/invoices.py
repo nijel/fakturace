@@ -153,6 +153,14 @@ class Invoice(object):
     def paid(self):
         return os.path.exists(self.name.replace(".ini", ".paid"))
 
+    @cached_property
+    def paid_path(self):
+        return self.storage.path(self.storage.data, "{}.paid".format(self.invoiceid))
+
+    def mark_paid(self, text):
+        with open(self.paid_path, "w") as handle:
+            handle.write(text)
+
 
 class Quote(Invoice):
     def __init__(self, storage, data):
