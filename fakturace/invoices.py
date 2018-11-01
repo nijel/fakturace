@@ -103,6 +103,10 @@ class Invoice(object):
     def tex_path(self):
         return self.storage.path(self.storage.tex, "{}.tex".format(self.invoiceid))
 
+    @cached_property
+    def pdf_path(self):
+        return self.storage.path(self.storage.pdf, "{}.pdf".format(self.invoiceid))
+
     def write_tex(self):
         row_template = self.storage.jinja.get_template(self.invoice["row"])
 
