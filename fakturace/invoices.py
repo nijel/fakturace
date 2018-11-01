@@ -28,17 +28,11 @@ class Invoice(object):
 
         self.invoice = dict(data["invoice"])
 
-        data = ConfigParser()
-        data.read(os.path.join("contacts", "{0}.ini".format(self.invoice["contact"])))
-
-        self.contact = dict(data["contact"])
+        self.contact = self.storage.read_contact(self.invoice["contact"])
 
         self.process_defaults()
 
-        data = ConfigParser()
-        data.read(os.path.join("banks", "{0}.ini".format(self.invoice["currency"])))
-
-        self.bank = dict(data["bank"])
+        self.bank = self.storage.read_bank(self.invoice["currency"])
         # Propagate defaults from bank
         for field in ("template", "note", "vat"):
             if field in self.bank:

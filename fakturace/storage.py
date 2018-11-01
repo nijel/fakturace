@@ -35,6 +35,7 @@ class InvoiceStorage:
     tex = "tex"
     config = "config"
     contacts = "contacts"
+    banks = "banks"
 
     template = "{year}{month}{order}.ini"
     order = "{:02d}"
@@ -79,7 +80,9 @@ class InvoiceStorage:
             yield self.base(self, filename)
 
     def get(self, invoice):
-        return self.base(self, self.path(self.data, "{}.ini".format(invoice)))
+        if '/' not in invoice:
+            return self.base(self, self.path(self.data, "{}.ini".format(invoice)))
+        return self.base(self, self.path(invoice))
 
     @cached_property
     def settings(self):
@@ -142,6 +145,11 @@ class InvoiceStorage:
     def read_contact(self, name):
         data = self.parse_contact(name)
         return dict(data["contact"])
+
+    def read_bank(self, name):
+        data = ConfigParser()
+        data.read(self.path(self.banks, "{0}.ini".format(name)))
+        return dict(data["bank"])
 
     def update_contact(
         self,
