@@ -2,12 +2,31 @@
 import datetime
 from glob import glob
 import os
+import re
 from configparser import ConfigParser
+
+import jinja2
 
 from filelock import FileLock
 
 from fakturace.invoices import Invoice, Quote
 from fakturace.utils import cached_property
+
+LATEX_SUBS = (
+    (re.compile(r"\\"), r"\\textbackslash"),
+    (re.compile(r"([{}_#%&$])"), r"\\\1"),
+    (re.compile(r"~"), r"\~{}"),
+    (re.compile(r"\^"), r"\^{}"),
+    (re.compile(r'"'), r"''"),
+    (re.compile(r"\.\.\.+"), r"\\ldots"),
+)
+
+
+def escape_tex(value):
+    newval = value
+    for pattern, replacement in LATEX_SUBS:
+        newval = pattern.sub(replacement, newval)
+    return newval
 
 
 class InvoiceStorage:
@@ -25,6 +44,20 @@ class InvoiceStorage:
     def __init__(self, basedir="."):
         self.basedir = basedir
         self.lock = FileLock(self.path(self.config, "lock"))
+        self.jinja = jinja2.Environment(
+            block_start_string="\BLOCK{",
+            block_end_string="}",
+            variable_start_string="\VAR{",
+            variable_end_string="}",
+            comment_start_string="\#{",
+            comment_end_string="}",
+            line_statement_prefix="%%",
+            line_comment_prefix="%#",
+            trim_blocks=True,
+            autoescape=False,
+            loader=jinja2.FileSystemLoader(os.path.abspath(basedir)),
+        )
+        self.jinja.filters["escape_tex"] = escape_tex
 
     def path(self, *args):
         return os.path.join(self.basedir, *args)

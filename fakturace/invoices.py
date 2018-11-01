@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import os
-from string import Template
 from subprocess import Popen
 from configparser import ConfigParser
 
@@ -104,21 +103,19 @@ class Invoice(object):
         return self.storage.path(self.storage.tex, "{}.tex".format(self.invoiceid))
 
     def write_tex(self):
-        with open(self.invoice["row"], "r") as handle:
-            row_template = Template(handle.read())
+        row_template = self.storage.jinja.get_template(self.invoice["row"])
 
-        with open(self.invoice["template"], "r") as handle:
-            template = Template(handle.read())
+        template = self.storage.jinja.get_template(self.invoice["template"])
 
         rows = []
         for row in self.invoice["rows_data"]:
-            rows.append(row_template.substitute(row))
+            rows.append(row_template.render(row))
 
         context = {"invoiceid": self.invoiceid, "rows": "\n".join(rows)}
         context.update(self.contact)
         context.update(self.invoice)
         context.update(self.bank)
-        output = template.substitute(context)
+        output = template.render(context)
         with open(self.tex_path, "w") as handle:
             handle.write(output)
 
