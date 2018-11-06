@@ -50,7 +50,6 @@ class List(Command):
         parser.add_argument(
             "--year",
             type=int,
-            nargs="?",
             help="Year to process",
             default=datetime.date.today().year,
         )
@@ -161,7 +160,6 @@ class Summary(Command):
         parser.add_argument(
             "--year",
             type=int,
-            nargs="?",
             help="Year to process",
             default=datetime.date.today().year,
         )
