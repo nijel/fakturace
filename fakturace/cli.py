@@ -119,8 +119,7 @@ class Detail(Command):
         print("Rate:      {0} {1}".format(invoice.rate, invoice.currency))
         print("Quantity:  {0}".format(invoice.quantity))
         print("Amount:    {0} {1}".format(invoice.amount, invoice.currency))
-        if invoice.currency != "CZK":
-            print("Amount:    {0:.2f} CZK".format(invoice.amount_czk))
+        print("Amount:    {0:.2f} CZK incl. VAT".format(invoice.amount_czk))
         if invoice.paid():
             print("Paid:      yes")
         else:
