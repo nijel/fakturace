@@ -148,7 +148,11 @@ class Invoice(object):
     @property
     def amount_czk(self):
         rate = Rates.get(self.invoice["date"], self.currency)
-        return float(self.invoice["total"]) * rate
+        if 'total_sum' in self.invoice:
+            total = self.invoice["total_sum"]
+        else:
+            total = self.invoice["total"]
+        return float(total) * rate
 
     def paid(self):
         return os.path.exists(self.name.replace(".ini", ".paid"))
