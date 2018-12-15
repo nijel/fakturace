@@ -53,6 +53,12 @@ class List(Command):
             help="Year to process",
             default=datetime.date.today().year,
         )
+        parser.add_argument(
+            "--vat",
+            action="store_true",
+            help="Include VAT",
+            default=False,
+        )
         parser.add_argument("match", nargs="?", help="Match string to find")
         return parser
 
@@ -71,16 +77,20 @@ class List(Command):
         for invoice in self.storage.list(self.args.year):
             if not self.match(invoice):
                 continue
+            if self.args.vat:
+                amount = invoice.amount_czk_vat
+            else:
+                amount = invoice.amount_czk
             print(
                 "{0}: {1} {2} ({4:.2f} CZK): {3}".format(
                     invoice.invoiceid,
                     invoice.amount,
                     invoice.currency,
                     invoice.invoice["item"],
-                    invoice.amount_czk,
+                    amount,
                 )
             )
-            total += invoice.amount_czk
+            total += amount
         print()
         print("Total: {0:.2f} CZK".format(total))
 
@@ -162,6 +172,12 @@ class Summary(Command):
             help="Year to process",
             default=datetime.date.today().year,
         )
+        parser.add_argument(
+            "--vat",
+            action="store_true",
+            help="Include VAT",
+            default=False,
+        )
         parser.add_argument("--summary", "-s", action="store_true", help="show YTD sum")
         return parser
 
@@ -180,10 +196,14 @@ class Summary(Command):
             total = 0
             cats = {x: 0 for x in categories}
             for invoice in self.storage.list(year, month):
-                cats[invoice.category] += invoice.amount_czk
-                supercats[invoice.category] += invoice.amount_czk
-                total += invoice.amount_czk
-                supertotal += invoice.amount_czk
+                if self.args.vat:
+                    amount = invoice.amount_czk_vat
+                else:
+                    amount = invoice.amount_czk
+                cats[invoice.category] += amount
+                supercats[invoice.category] += amount
+                total += amount
+                supertotal += amount
             if self.args.summary:
                 print(
                     "{0}/{1:02d} {2:7.0f} CZK {3}".format(

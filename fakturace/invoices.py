@@ -148,6 +148,11 @@ class Invoice(object):
     @property
     def amount_czk(self):
         rate = Rates.get(self.invoice["date"], self.currency)
+        return float(self.invoice["total"]) * rate
+
+    @property
+    def amount_czk_vat(self):
+        rate = Rates.get(self.invoice["date"], self.currency)
         if 'total_sum' in self.invoice:
             total = self.invoice["total_sum"]
         else:
