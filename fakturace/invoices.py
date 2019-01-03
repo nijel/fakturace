@@ -45,27 +45,26 @@ class Invoice(object):
             if "item" + suffix not in self.invoice:
                 break
             quantity = self.invoice.get("quantity" + suffix, "1")
-            rate = self.invoice["rate" + suffix]
-            total = round(float(quantity.split()[0]) * float(rate), 2)
+            rate = float(self.invoice["rate" + suffix])
+            total = float(quantity.split()[0]) * rate
             total_sum += total
             self.invoice["rows_data"].append(
                 {
                     "item": self.invoice["item" + suffix],
-                    "rate": rate,
+                    "rate": "{0:.2f}".format(rate),
                     "quantity": quantity,
                     "total": "{0:.2f}".format(total),
                     "currency": self.invoice["currency"],
                 }
             )
 
-        self.invoice["total"] = "{0:.2f}".format(round(total_sum, 2))
+        self.invoice["total"] = "{0:.2f}".format(total_sum)
 
         # Calculate VAT
-        total = float(self.invoice["total"])
         if int(self.invoice["vat"]):
-            vat = round(int(self.invoice["vat"]) * total / 100, 2)
+            vat = int(self.invoice["vat"]) * total_sum / 100
             self.invoice["total_vat"] = "{0:.2f}".format(vat)
-            self.invoice["total_sum"] = "{0:.2f}".format(total + vat)
+            self.invoice["total_sum"] = "{0:.2f}".format(total_sum + vat)
 
         # Shorter summary for PDF title
         self.invoice["shortitem"] = self.invoice["item"].split(":")[0]
