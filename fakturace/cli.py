@@ -2,6 +2,8 @@ from argparse import ArgumentParser
 import datetime
 import subprocess
 
+from vies.types import VATIN
+
 from fakturace.storage import InvoiceStorage, QuoteStorage, WebStorage
 
 
@@ -237,6 +239,14 @@ class Add(Command):
         return parser
 
     def run(self):
+        contact = self.storage.read_contact(self.args.contact)
+        vat_reg = contact.get('vat_reg', '')
+        if vat_reg:
+            vat_reg = vat_reg.strip().replace(' ', '')
+            vatin = VATIN(vat_reg[:2], vat_reg[2:])
+            if not vatin.data.valid:
+                raise Exception('Invalid VAT: {}'.format(vat_reg))
+
         filename = self.storage.create(self.args.contact)
         print(filename)
         if self.args.edit:
