@@ -71,6 +71,7 @@ class List(Command):
         return (
             match in invoice.invoice["item"].lower()
             or match in invoice.invoice["contact"].lower()
+            or match in invoice.contact["name"].lower()
         )
 
     def run(self):
