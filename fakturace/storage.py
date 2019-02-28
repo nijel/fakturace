@@ -183,7 +183,7 @@ class InvoiceStorage:
         contact.set("contact", "default_currency", default_currency)
         contact.set("contact", "default_category", default_category)
 
-        with open(filename, "wb") as handle:
+        with open(filename, "w") as handle:
             contact.write(handle)
         return filename
 
