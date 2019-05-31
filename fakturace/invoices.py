@@ -184,4 +184,11 @@ class Quote(Invoice):
 
 class Proforma(Invoice):
     def __init__(self, storage, data):
-        super().__init__(storage, data, {"template": "template/proforma.tex"})
+        super().__init__(
+            storage,
+            data,
+            {
+                "template": "template/proforma.tex",
+                "note": "This is not a tax invoice, you will receive proper invoice upon payment.",
+            },
+        )
