@@ -130,6 +130,9 @@ class InvoiceStorage:
                 if not invoice.has_option("invoice", key):
                     invoice.set("invoice", key, "")
             # Store the file
+            dirname = os.path.dirname(filename)
+            if not os.path.exists(dirname):
+                os.makedirs(dirname)
             with open(filename, "w") as handle:
                 invoice.write(handle)
             return filename
