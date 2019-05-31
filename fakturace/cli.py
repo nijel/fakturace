@@ -58,10 +58,7 @@ class List(Command):
             default=datetime.date.today().year,
         )
         parser.add_argument(
-            "--vat",
-            action="store_true",
-            help="Include VAT",
-            default=False,
+            "--vat", action="store_true", help="Include VAT", default=False
         )
         parser.add_argument("match", nargs="?", help="Match string to find")
         return parser
@@ -178,10 +175,7 @@ class Summary(Command):
             default=datetime.date.today().year,
         )
         parser.add_argument(
-            "--vat",
-            action="store_true",
-            help="Include VAT",
-            default=False,
+            "--vat", action="store_true", help="Include VAT", default=False
         )
         parser.add_argument("--summary", "-s", action="store_true", help="show YTD sum")
         return parser
@@ -243,12 +237,12 @@ class Add(Command):
 
     def run(self):
         contact = self.storage.read_contact(self.args.contact)
-        vat_reg = contact.get('vat_reg', '')
+        vat_reg = contact.get("vat_reg", "")
         if vat_reg:
-            vat_reg = vat_reg.strip().replace(' ', '')
+            vat_reg = vat_reg.strip().replace(" ", "")
             vatin = VATIN(vat_reg[:2], vat_reg[2:])
             if not vatin.data.valid:
-                raise Exception('Invalid VAT: {}'.format(vat_reg))
+                raise Exception("Invalid VAT: {}".format(vat_reg))
 
         filename = self.storage.create(self.args.contact)
         print(filename)
@@ -269,7 +263,9 @@ def main(args=None):
         "--quotes", action="store_true", help="Operate on quotes instead of invoices"
     )
     parser.add_argument("--web", action="store_true", help="Operate on web invoices")
-    parser.add_argument("--proforma", action="store_true", help="Operate on proforma invoices")
+    parser.add_argument(
+        "--proforma", action="store_true", help="Operate on proforma invoices"
+    )
 
     subparser = parser.add_subparsers(dest="cmd")
     for command in COMMANDS:

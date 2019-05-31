@@ -152,7 +152,7 @@ class Invoice(object):
     @property
     def amount_czk_vat(self):
         rate = Rates.get(self.invoice["date"], self.currency)
-        if 'total_sum' in self.invoice:
+        if "total_sum" in self.invoice:
             total = self.invoice["total_sum"]
         else:
             total = self.invoice["total"]
@@ -184,10 +184,4 @@ class Quote(Invoice):
 
 class Proforma(Invoice):
     def __init__(self, storage, data):
-        super().__init__(
-            storage,
-            data,
-            {
-                "template": "template/proforma.tex",
-            },
-        )
+        super().__init__(storage, data, {"template": "template/proforma.tex"})
