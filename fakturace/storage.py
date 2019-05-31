@@ -9,8 +9,8 @@ import jinja2
 
 from filelock import FileLock
 
-from fakturace.invoices import Invoice, Quote
-from fakturace.utils import cached_property
+from .invoices import Invoice, Quote, Proforma
+from .utils import cached_property
 
 LATEX_SUBS = (
     (re.compile(r"\\"), r"\\textbackslash"),
@@ -199,3 +199,13 @@ class QuoteStorage(InvoiceStorage):
 class WebStorage(InvoiceStorage):
     template = "W{year}{month}{order}.ini"
     order = "{:03d}"
+
+
+class ProformaStorage(InvoiceStorage):
+    data = "proforma"
+    pdf = "proforma"
+    tex = "proforma"
+    template = "PF{year}{order}.ini"
+    order = "{:06d}"
+
+    base = Proforma

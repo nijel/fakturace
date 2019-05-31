@@ -180,3 +180,14 @@ class Quote(Invoice):
                 "note": "If you have any questions concerning this quotation, contact Michal Čihař, michal@cihar.com.",
             },
         )
+
+
+class Proforma(Invoice):
+    def __init__(self, storage, data):
+        super().__init__(
+            storage,
+            data,
+            {
+                "template": "template/proforma.tex",
+            },
+        )

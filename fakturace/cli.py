@@ -4,7 +4,7 @@ import subprocess
 
 from vies.types import VATIN
 
-from fakturace.storage import InvoiceStorage, QuoteStorage, WebStorage
+from .storage import InvoiceStorage, QuoteStorage, WebStorage, ProformaStorage
 
 
 COMMANDS = {}
@@ -27,6 +27,8 @@ class Command(object):
             self.storage = QuoteStorage()
         elif args.web:
             self.storage = WebStorage()
+        elif args.proforma:
+            self.storage = ProformaStorage()
         else:
             self.storage = InvoiceStorage()
 
@@ -267,6 +269,7 @@ def main(args=None):
         "--quotes", action="store_true", help="Operate on quotes instead of invoices"
     )
     parser.add_argument("--web", action="store_true", help="Operate on web invoices")
+    parser.add_argument("--proforma", action="store_true", help="Operate on proforma invoices")
 
     subparser = parser.add_subparsers(dest="cmd")
     for command in COMMANDS:
