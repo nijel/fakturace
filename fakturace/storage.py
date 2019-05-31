@@ -66,13 +66,17 @@ class InvoiceStorage:
     def glob(self, year=None, month=None):
         if year:
             year = "{:02d}".format(year % 2000)
+            full_year = str(year)
         else:
             year = "[0-9][0-9]"
+            full_year = "[0-9][0-9][0-9][0-9]"
         if month:
             month = "{:02d}".format(month)
         else:
             month = "[0-9][0-9]"
-        mask = self.template.format(year=year, month=month, order="*")
+        mask = self.template.format(
+            year=year, month=month, order="*", full_year=full_year
+        )
         return sorted(glob(self.path(self.data, mask)))
 
     def list(self, year=None, month=None):
@@ -93,12 +97,16 @@ class InvoiceStorage:
     def find_filename(self):
         today = datetime.date.today()
         year = today.strftime("%y")
+        full_year = today.strftime("%Y")
         month = today.strftime("%m")
         for i in range(1, 1000):
             filename = self.path(
                 self.data,
                 self.template.format(
-                    year=year, month=month, order=self.order.format(i)
+                    year=year,
+                    month=month,
+                    order=self.order.format(i),
+                    full_year=full_year,
                 ),
             )
             if os.path.exists(filename):
@@ -208,7 +216,7 @@ class ProformaStorage(InvoiceStorage):
     data = "proforma"
     pdf = "proforma"
     tex = "proforma"
-    template = "PF{year}{order}.ini"
-    order = "{:06d}"
+    template = "PF{full_year}{order}.ini"
+    order = "{:04d}"
 
     base = Proforma
