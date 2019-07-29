@@ -177,7 +177,7 @@ class Quote(Invoice):
             data,
             {
                 "template": "template/quote.tex",
-                "note": "If you have any questions concerning this quotation, contact Michal Čihař, michal@cihar.com.",
+                "note": "If you have any questions concerning this quotation, contact us at sales@weblate.org.",
             },
         )
 
