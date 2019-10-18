@@ -216,7 +216,7 @@ class ProformaStorage(InvoiceStorage):
     data = "proforma"
     pdf = "proforma"
     tex = "proforma"
-    template = "PF{full_year}{order}.ini"
-    order = "{:04d}"
+    template = "P{full_year}{order}.ini"
+    order = "{:05d}"
 
     base = Proforma
