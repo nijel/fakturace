@@ -65,11 +65,11 @@ class InvoiceStorage:
 
     def glob(self, year=None, month=None):
         if year:
-            year = "{:02d}".format(year % 2000)
             full_year = str(year)
+            year = "{:02d}".format(year % 2000)
         else:
-            year = "[0-9][0-9]"
             full_year = "[0-9][0-9][0-9][0-9]"
+            year = "[0-9][0-9]"
         if month:
             month = "{:02d}".format(month)
         else:
