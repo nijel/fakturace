@@ -61,10 +61,19 @@ class Invoice(object):
         self.invoice["total"] = "{0:.2f}".format(total_sum)
 
         # Calculate VAT
+        vat = int(self.invoice["vat"]) * total_sum / 100
         if int(self.invoice["vat"]):
-            vat = int(self.invoice["vat"]) * total_sum / 100
             self.invoice["total_vat"] = "{0:.2f}".format(vat)
             self.invoice["total_sum"] = "{0:.2f}".format(total_sum + vat)
+        self.invoice["include_czk"] = bool(int(self.invoice["vat"])) and self.contact["vat_reg"].startswith("CZ")
+
+        # Rates in CZK
+        if self.invoice["include_czk"]:
+            rate = Rates.get(self.invoice["date"], self.currency)
+            self.invoice["czk_rate"] = str(rate)
+            self.invoice["czk_total"] = "{0:.2f}".format(rate * total_sum)
+            self.invoice["czk_total_vat"] = "{0:.2f}".format(rate * vat)
+            self.invoice["czk_total_sum"] = "{0:.2f}".format(rate * (total_sum + vat))
 
         # Shorter summary for PDF title
         self.invoice["shortitem"] = self.invoice["item"].split(":")[0]
