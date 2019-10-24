@@ -142,6 +142,12 @@ class Invoice(object):
         return self.invoice["total"]
 
     @property
+    def total_amount(self):
+        if "total_sum" in self.invoice:
+            return self.invoice["total_sum"]
+        return self.invoice["total"]
+
+    @property
     def currency(self):
         return self.invoice["currency"].split("-")[0]
 
