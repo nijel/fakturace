@@ -32,7 +32,9 @@ class Invoice(object):
 
         self.process_defaults()
 
-        self.bank = self.storage.read_bank(self.invoice["currency"], self.invoice["bank_suffix"])
+        self.bank = self.storage.read_bank(
+            self.invoice["currency"], self.invoice["bank_suffix"]
+        )
         # Propagate defaults from bank
         for field in ("template", "note", "vat"):
             if field in self.bank:
@@ -65,7 +67,9 @@ class Invoice(object):
         if int(self.invoice["vat"]):
             self.invoice["total_vat"] = "{0:.2f}".format(vat)
             self.invoice["total_sum"] = "{0:.2f}".format(total_sum + vat)
-        self.invoice["include_czk"] = bool(int(self.invoice["vat"])) and self.contact["vat_reg"].startswith("CZ")
+        self.invoice["include_czk"] = bool(int(self.invoice["vat"])) and self.contact[
+            "vat_reg"
+        ].startswith("CZ")
 
         # Rates in CZK
         if self.invoice["include_czk"]:
