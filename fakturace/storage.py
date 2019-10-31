@@ -157,11 +157,11 @@ class InvoiceStorage:
         data = self.parse_contact(name)
         return dict(data["contact"])
 
-    def read_bank(self, name, extra=None):
+    def read_bank(self, name, extra_suffix=None):
         data = ConfigParser()
         data.read(self.path(self.banks, "{0}.ini".format(name)))
-        if extra:
-            data.read(self.path(self.banks, "{0}.ini".format(extra)))
+        if extra_suffix:
+            data.read(self.path(self.banks, "{0}-{1}.ini".format(name, extra_suffix)))
         return dict(data["bank"])
 
     def update_contact(
@@ -222,6 +222,3 @@ class ProformaStorage(InvoiceStorage):
     order = "{:05d}"
 
     base = Proforma
-
-    def read_bank(self, name):
-        return super().read_bank(name, '{}-proforma'.format(name))

@@ -3,6 +3,7 @@ import os
 DEFAULTS = {
     "quantity": "1",
     "currency": "EUR",
+    "bank_suffix": "",
     "currency_note": "",
     "note": "",
     "category": "none",

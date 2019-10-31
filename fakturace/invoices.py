@@ -32,7 +32,7 @@ class Invoice(object):
 
         self.process_defaults()
 
-        self.bank = self.storage.read_bank(self.invoice["currency"])
+        self.bank = self.storage.read_bank(self.invoice["currency"], self.invoice["bank_suffix"])
         # Propagate defaults from bank
         for field in ("template", "note", "vat"):
             if field in self.bank:
@@ -207,3 +207,7 @@ class Proforma(Invoice):
                 "note": "This is not a tax invoice, you will receive proper invoice upon payment.",
             },
         )
+
+    def process_defaults(self):
+        super().process_defaults()
+        self.invoice["bank_suffix"] = "proforma"
