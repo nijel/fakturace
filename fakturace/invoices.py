@@ -43,11 +43,14 @@ class Invoice(object):
         # Fetch invoice rows
         self.invoice["rows_data"] = []
         total_sum = 0
-        for suffix in ("", "_2", "_3", "_4", "_5", "_6"):
+        for suffix in ("", "_2", "_3", "_4", "_5", "_6", "_7", "_8", "_9"):
             if "item" + suffix not in self.invoice:
                 break
             quantity = self.invoice.get("quantity" + suffix, "1")
-            rate = float(self.invoice["rate" + suffix])
+            try:
+                rate = float(self.invoice["rate" + suffix])
+            except KeyError:
+                rate = float(self.invoice["rate"])
             total = float(quantity.split()[0]) * rate
             total_sum += total
             self.invoice["rows_data"].append(
