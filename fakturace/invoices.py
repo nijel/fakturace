@@ -8,7 +8,7 @@ from .data import CONTACT, DEFAULTS
 from .rates import Rates
 
 
-class Invoice(object):
+class Invoice:
     def __init__(self, storage, data, override=None):
         self.name = data
         self.storage = storage

@@ -5,7 +5,7 @@ from urllib.request import urlopen
 from fakturace.data import CACHE_DIR, RATE_URL
 
 
-class Rates(object):
+class Rates:
     datacache = {}
 
     @classmethod
