@@ -1,4 +1,5 @@
-# Fakturace
+Fakturace
+=========
 
 Jednoduché generování faktur:
 
