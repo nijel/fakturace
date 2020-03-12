@@ -2,9 +2,10 @@ import os
 import subprocess
 from configparser import ConfigParser
 
-from fakturace.data import CONTACT, DEFAULTS
-from fakturace.rates import Rates
-from fakturace.utils import cached_property
+from cached_property import cached_property
+
+from .data import CONTACT, DEFAULTS
+from .rates import Rates
 
 
 class Invoice(object):
@@ -21,7 +22,7 @@ class Invoice(object):
         self.load()
 
     def load(self):
-        """Loads data from ini files"""
+        """Load data from ini files."""
         data = ConfigParser()
         data.read(self.name)
 
@@ -85,7 +86,7 @@ class Invoice(object):
         self.invoice["shortitem"] = self.invoice["item"].split(":")[0]
 
     def process_defaults(self):
-        """Fills in default values"""
+        """Fill in default values."""
         for key in self.contact.keys():
             if not key.startswith("default_"):
                 continue
@@ -198,7 +199,10 @@ class Quote(Invoice):
             data,
             {
                 "template": "template/quote.tex",
-                "note": "If you have any questions concerning this quotation, contact us at sales@weblate.org.",
+                "note": (
+                    "Should you have any questions concerning this quotation, "
+                    "please contact us at sales@weblate.org."
+                ),
             },
         )
 
@@ -210,7 +214,10 @@ class Proforma(Invoice):
             data,
             {
                 "template": "template/proforma.tex",
-                "note": "This is not a tax invoice, you will receive proper invoice upon payment.",
+                "note": (
+                    "This is not a tax invoice, "
+                    "you will receive proper invoice upon payment."
+                ),
             },
         )
 

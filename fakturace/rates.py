@@ -6,7 +6,7 @@ from fakturace.data import CACHE_DIR, RATE_URL
 
 
 class Rates(object):
-    _datacache = {}
+    datacache = {}
 
     @classmethod
     def download(cls, date):
@@ -15,13 +15,13 @@ class Rates(object):
         cache_file = os.path.join(CACHE_DIR, "rates-{0}".format(date))
 
         # Filesystem cache
-        if date not in cls._datacache and os.path.exists(cache_file):
+        if date not in cls.datacache and os.path.exists(cache_file):
             with open(cache_file, "r") as handle:
-                cls._datacache[date] = json.load(handle)
+                cls.datacache[date] = json.load(handle)
 
         # Load remotely
-        if date not in cls._datacache:
-            cls._datacache[date] = {}
+        if date not in cls.datacache:
+            cls.datacache[date] = {}
             parts = date.split("-")
             handle = urlopen(RATE_URL.format(*parts))
             content = handle.read().decode("utf-8")
@@ -31,13 +31,13 @@ class Rates(object):
                 parts = line.split("|")
                 if parts[4] == "kurz":
                     continue
-                cls._datacache[date][parts[3]] = float(parts[4].replace(",", "."))
+                cls.datacache[date][parts[3]] = float(parts[4].replace(",", "."))
 
             # Update filesystem cache
             with open(cache_file, "w") as handle:
-                json.dump(cls._datacache[date], handle)
+                json.dump(cls.datacache[date], handle)
 
-        return cls._datacache[date]
+        return cls.datacache[date]
 
     @classmethod
     def get(cls, date, currency):

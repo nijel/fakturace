@@ -5,10 +5,10 @@ from configparser import ConfigParser
 from glob import glob
 
 import jinja2
+from cached_property import cached_property
 from filelock import FileLock
 
 from .invoices import Invoice, Proforma, Quote
-from .utils import cached_property
 
 LATEX_SUBS = (
     (re.compile(r"\\"), r"\\textbackslash"),
@@ -44,11 +44,11 @@ class InvoiceStorage:
         self.basedir = basedir
         self.lock = FileLock(self.path(self.config, "lock"))
         self.jinja = jinja2.Environment(
-            block_start_string="\BLOCK{",
+            block_start_string=r"\BLOCK{",
             block_end_string="}",
-            variable_start_string="\VAR{",
+            variable_start_string=r"\VAR{",
             variable_end_string="}",
-            comment_start_string="\#{",
+            comment_start_string=r"\#{",
             comment_end_string="}",
             line_statement_prefix="%%",
             line_comment_prefix="%#",
