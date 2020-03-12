@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+
 import os
 import sys
+
 from setuptools import setup
 
 with open("README.rst") as handle:
@@ -23,9 +23,7 @@ setup(
     keywords="billing invoice",
     url="https://cihar.com/",
     download_url="https://github.com/nijel/fakturace",
-    project_urls={
-        "Issue Tracker": "https://github.com/nijel/fakturace/issues",
-    }
+    project_urls={"Issue Tracker": "https://github.com/nijel/fakturace/issues",},
     platforms=["any"],
     packages=["fakturace"],
     package_dir={"fakturace": "fakturace"},

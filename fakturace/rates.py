@@ -1,9 +1,8 @@
-# -*- coding: utf-8 -*-
 import json
 import os
 from urllib.request import urlopen
 
-from fakturace.data import RATE_URL, CACHE_DIR
+from fakturace.data import CACHE_DIR, RATE_URL
 
 
 class Rates(object):

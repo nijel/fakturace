@@ -1,11 +1,10 @@
-from argparse import ArgumentParser
 import datetime
 import subprocess
+from argparse import ArgumentParser
 
 from vies.types import VATIN
 
-from .storage import InvoiceStorage, QuoteStorage, WebStorage, ProformaStorage
-
+from .storage import InvoiceStorage, ProformaStorage, QuoteStorage, WebStorage
 
 COMMANDS = {}
 

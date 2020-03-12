@@ -1,9 +1,8 @@
-# -*- coding: utf-8 -*-
 import os
 import subprocess
 from configparser import ConfigParser
 
-from fakturace.data import DEFAULTS, CONTACT
+from fakturace.data import CONTACT, DEFAULTS
 from fakturace.rates import Rates
 from fakturace.utils import cached_property
 

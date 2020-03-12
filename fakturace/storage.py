@@ -1,15 +1,13 @@
-# -*- coding: utf-8 -*-
 import datetime
-from glob import glob
 import os
 import re
 from configparser import ConfigParser
+from glob import glob
 
 import jinja2
-
 from filelock import FileLock
 
-from .invoices import Invoice, Quote, Proforma
+from .invoices import Invoice, Proforma, Quote
 from .utils import cached_property
 
 LATEX_SUBS = (
