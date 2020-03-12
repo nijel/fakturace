@@ -87,22 +87,22 @@ class Invoice(object):
 
     def process_defaults(self):
         """Fill in default values."""
-        for key in self.contact.keys():
+        for key, value in self.contact.items():
             if not key.startswith("default_"):
                 continue
             name = key[8:]
             if name in self.invoice:
                 continue
-            self.invoice[name] = self.contact[key]
-        for key in self.override.keys():
+            self.invoice[name] = value
+        for key, value in self.override.items():
             if key not in self.invoice:
-                self.invoice[key] = self.override[key]
-        for key in DEFAULTS.keys():
+                self.invoice[key] = value
+        for key, value in DEFAULTS.items():
             if key not in self.invoice:
-                self.invoice[key] = DEFAULTS[key]
-        for key in CONTACT.keys():
+                self.invoice[key] = value
+        for key, value in CONTACT.items():
             if key not in self.contact:
-                self.contact[key] = CONTACT[key]
+                self.contact[key] = value
 
     @cached_property
     def invoiceid(self):
