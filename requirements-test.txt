@@ -1,3 +1,5 @@
 codecov
 pre-commit
+pytest
+pytest-cov
 twine
