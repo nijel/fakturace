@@ -130,10 +130,12 @@ class Invoice:
         context.update(self.invoice)
         context.update(self.bank)
         output = template.render(context)
+        self.storage.ensure_dir(self.tex_path)
         with open(self.tex_path, "w") as handle:
             handle.write(output)
 
     def build_pdf(self):
+        self.storage.ensure_dir(self.pdf_path)
         subprocess.run(
             ["pdflatex", os.path.abspath(self.tex_path)],
             check=True,

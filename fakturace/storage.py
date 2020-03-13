@@ -42,7 +42,9 @@ class InvoiceStorage:
 
     def __init__(self, basedir="."):
         self.basedir = basedir
-        self.lock = FileLock(self.path(self.config, "lock"))
+        lockfile = self.path(self.config, "lock")
+        self.ensure_dir(lockfile)
+        self.lock = FileLock(lockfile)
         self.jinja = jinja2.Environment(
             block_start_string=r"\BLOCK{",
             block_end_string="}",
@@ -57,6 +59,12 @@ class InvoiceStorage:
             loader=jinja2.FileSystemLoader(os.path.abspath(basedir)),
         )
         self.jinja.filters["escape_tex"] = escape_tex
+
+    @staticmethod
+    def ensure_dir(filename):
+        dirname = os.path.dirname(filename)
+        if not os.path.exists(dirname):
+            os.makedirs(dirname)
 
     def path(self, *args):
         return os.path.join(self.basedir, *args)
@@ -136,9 +144,7 @@ class InvoiceStorage:
                 if not invoice.has_option("invoice", key):
                     invoice.set("invoice", key, "")
             # Store the file
-            dirname = os.path.dirname(filename)
-            if not os.path.exists(dirname):
-                os.makedirs(dirname)
+            self.ensure_dir(filename)
             with open(filename, "w") as handle:
                 invoice.write(handle)
             return filename
@@ -155,12 +161,34 @@ class InvoiceStorage:
         data = self.parse_contact(name)
         return dict(data["contact"])
 
+    def bank_path(self, name):
+        return self.path(self.banks, "{0}.ini".format(name))
+
     def read_bank(self, name, extra_suffix=None):
         data = ConfigParser()
-        data.read(self.path(self.banks, "{0}.ini".format(name)))
+        data.read(self.bank_path(name))
         if extra_suffix:
             data.read(self.path(self.banks, "{0}-{1}.ini".format(name, extra_suffix)))
         return dict(data["bank"])
+
+    def update_bank(self, name, **kwargs):
+        filename = self.bank_path(name)
+        self.ensure_dir(filename)
+        if os.path.exists(filename):
+            bank = ConfigParser()
+            bank.read(filename)
+        else:
+            bank = ConfigParser()
+
+        if not bank.has_section("bank"):
+            bank.add_section("bank")
+
+        for name, value in kwargs.items():
+            bank.set("bank", name, value)
+
+        with open(filename, "w") as handle:
+            bank.write(handle)
+        return filename
 
     def update_contact(
         self,
@@ -176,6 +204,7 @@ class InvoiceStorage:
         default_category,
     ):
         filename = self.contact_path(key)
+        self.ensure_dir(filename)
         if os.path.exists(filename):
             contact = self.parse_contact(key)
         else:
