@@ -232,6 +232,7 @@ class QuoteStorage(InvoiceStorage):
     data = "quotes"
     pdf = "quotes"
     tex = "quotes"
+    template = "Q{full_year}{order}.ini"
 
     base = Quote
 
