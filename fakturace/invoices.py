@@ -87,7 +87,7 @@ class Invoice:
 
         remarks = []
         for pos in range(1, 10):
-            name = f"remark_{pos}"
+            name = "remark_{}".format(pos)
             if name not in self.invoice:
                 break
             remarks.append(self.invoice[name])
