@@ -85,6 +85,14 @@ class Invoice:
         # Shorter summary for PDF title
         self.invoice["shortitem"] = self.invoice["item"].split(":")[0]
 
+        remarks = []
+        for pos in range(1, 10):
+            name = f"remark_{pos}"
+            if name not in self.invoice:
+                break
+            remarks.append(self.invoice[name])
+        self.invoice["remarks"] = remarks
+
     def process_defaults(self):
         """Fill in default values."""
         for key, value in self.contact.items():
