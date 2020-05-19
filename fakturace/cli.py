@@ -81,12 +81,13 @@ class List(Command):
             else:
                 amount = invoice.amount_czk
             print(
-                "{0}: {1} {2} ({4:.2f} CZK): {3}".format(
+                "{0}: {1} {2} ({4:.2f} CZK): {3} [{5}]".format(
                     invoice.invoiceid,
                     invoice.amount,
                     invoice.currency,
                     invoice.invoice["item"],
                     amount,
+                    invoice.contact["name"],
                 )
             )
             total += amount
