@@ -145,7 +145,7 @@ class Invoice:
     def build_pdf(self):
         self.storage.ensure_dir(self.pdf_path)
         subprocess.run(
-            ["pdflatex", os.path.abspath(self.tex_path)],
+            ["xelatex", os.path.abspath(self.tex_path)],
             check=True,
             cwd=self.storage.path(self.storage.pdf),
         )
