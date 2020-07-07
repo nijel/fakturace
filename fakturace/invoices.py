@@ -3,6 +3,7 @@ import subprocess
 from configparser import ConfigParser
 
 from cached_property import cached_property
+from jinja2.exceptions import TemplateNotFound
 
 from .data import CONTACT, DEFAULTS
 from .rates import Rates
@@ -127,7 +128,14 @@ class Invoice:
     def write_tex(self):
         row_template = self.storage.jinja.get_template(self.invoice["row"])
 
-        template = self.storage.jinja.get_template(self.invoice["template"])
+        category_template = self.invoice["template"].replace(
+            ".tex", f"-{self.category}.tex"
+        )
+
+        try:
+            template = self.storage.jinja.get_template(category_template)
+        except TemplateNotFound:
+            template = self.storage.jinja.get_template(self.invoice["template"])
 
         rows = []
         for row in self.invoice["rows_data"]:
