@@ -222,6 +222,13 @@ class Add(Command):
     def add_parser(cls, subparser):
         """Create parser for command line."""
         parser = super().add_parser(subparser)
+        parser.add_argument(
+            "--skip-validation",
+            "-s",
+            action="store_true",
+            help="Skip VAT validation",
+            default=False,
+        )
         parser.add_argument("--edit", "-e", action="store_true", help="open in editor")
         parser.add_argument("contact", help="Contact name")
         return parser
@@ -232,7 +239,9 @@ class Add(Command):
         if vat_reg:
             vat_reg = vat_reg.strip().replace(" ", "")
             vatin = VATIN(vat_reg[:2], vat_reg[2:])
-            if not vatin.data.valid:
+            if self.args.skip_validation:
+                vatin.verify()
+            elif not vatin.data.valid:
                 raise Exception("Invalid VAT: {}".format(vat_reg))
 
         filename = self.storage.create(self.args.contact)
