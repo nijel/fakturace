@@ -10,7 +10,7 @@ with open("requirements.txt") as handle:
 
 setup(
     name="fakturace",
-    version="0.3",
+    version="0.4",
     author="Michal Čihař",
     author_email="michal@cihar.com",
     description="Simple invoicing and billing tool",
