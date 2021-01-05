@@ -2,7 +2,7 @@ import os
 import subprocess
 from configparser import ConfigParser
 
-from cached_property import cached_property
+from django.utils.functional import cached_property
 from jinja2.exceptions import TemplateNotFound
 
 from .data import CONTACT, DEFAULTS

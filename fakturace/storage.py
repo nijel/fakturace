@@ -5,7 +5,7 @@ from configparser import ConfigParser
 from glob import glob
 
 import jinja2
-from cached_property import cached_property
+from django.utils.functional import cached_property
 from filelock import FileLock
 
 from .invoices import Invoice, Proforma, Quote
