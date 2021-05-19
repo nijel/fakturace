@@ -120,7 +120,7 @@ class InvoiceStorage:
             return filename
         raise ValueError("Failed to find invoice number!")
 
-    def create(self, contact, duedelta=30, **kwargs):
+    def create(self, contact, duedelta=15, **kwargs):
         with self.lock:
             today = datetime.date.today()
             due = today + datetime.timedelta(days=duedelta)
