@@ -44,7 +44,27 @@ class Invoice:
         # Fetch invoice rows
         self.invoice["rows_data"] = []
         total_sum = 0
-        for suffix in ("", "_2", "_3", "_4", "_5", "_6", "_7", "_8", "_9"):
+        for suffix in (
+            "",
+            "_2",
+            "_3",
+            "_4",
+            "_5",
+            "_6",
+            "_7",
+            "_8",
+            "_9",
+            "_10",
+            "_11",
+            "_12",
+            "_13",
+            "_14",
+            "_15",
+            "_16",
+            "_17",
+            "_18",
+            "_19",
+        ):
             if "item" + suffix not in self.invoice:
                 break
             quantity = self.invoice.get("quantity" + suffix, "1")
