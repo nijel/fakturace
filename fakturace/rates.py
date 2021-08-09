@@ -29,7 +29,7 @@ class Rates:
                 if "|" not in line:
                     continue
                 parts = line.split("|")
-                if parts[4] == "kurz":
+                if parts[4] in ("kurz", "Rate"):
                     continue
                 cls.datacache[date][parts[3]] = float(parts[4].replace(",", "."))
 
