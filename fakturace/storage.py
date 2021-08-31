@@ -3,6 +3,7 @@ import os
 import re
 from configparser import ConfigParser
 from glob import glob
+from typing import Optional
 
 import jinja2
 from django.utils.functional import cached_property
@@ -34,6 +35,7 @@ class InvoiceStorage:
     config = "config"
     contacts = "contacts"
     banks = "banks"
+    default_due = 15
 
     template = "{year}{month}{order}.ini"
     order = "{:02d}"
@@ -120,7 +122,9 @@ class InvoiceStorage:
             return filename
         raise ValueError("Failed to find invoice number!")
 
-    def create(self, contact, duedelta=15, **kwargs):
+    def create(self, contact, duedelta: Optional[int] = None, **kwargs):
+        if duedelta is None:
+            duedelta = self.default_due
         with self.lock:
             today = datetime.date.today()
             due = today + datetime.timedelta(days=duedelta)
@@ -233,6 +237,7 @@ class QuoteStorage(InvoiceStorage):
     pdf = "quotes"
     tex = "quotes"
     template = "Q{full_year}{order}.ini"
+    default_due = 30
 
     base = Quote
 
