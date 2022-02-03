@@ -1,6 +1,6 @@
 import os
 import subprocess
-from configparser import ConfigParser
+from configparser import RawConfigParser
 
 from django.utils.functional import cached_property
 from jinja2.exceptions import TemplateNotFound
@@ -24,7 +24,7 @@ class Invoice:
 
     def load(self):
         """Load data from ini files."""
-        data = ConfigParser()
+        data = RawConfigParser()
         data.read(self.name)
 
         self.invoice = dict(data["invoice"])
