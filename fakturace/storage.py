@@ -1,7 +1,7 @@
 import datetime
 import os
 import re
-from configparser import ConfigParser
+from configparser import RawConfigParser
 from glob import glob
 from typing import Optional
 
@@ -98,7 +98,7 @@ class InvoiceStorage:
 
     @cached_property
     def settings(self):
-        data = ConfigParser()
+        data = RawConfigParser()
         data.read(self.path(self.config, "config.ini"))
         return dict(data["config"])
 
@@ -129,7 +129,7 @@ class InvoiceStorage:
             today = datetime.date.today()
             due = today + datetime.timedelta(days=duedelta)
             filename = self.find_filename()
-            invoice = ConfigParser()
+            invoice = RawConfigParser()
             invoice.add_section("invoice")
             invoice.set("invoice", "contact", contact)
             invoice.set("invoice", "date", today.isoformat())
@@ -157,7 +157,7 @@ class InvoiceStorage:
         return self.path(self.contacts, "{0}.ini".format(name))
 
     def parse_contact(self, name):
-        data = ConfigParser()
+        data = RawConfigParser()
         data.read(self.contact_path(name))
         return data
 
@@ -169,7 +169,7 @@ class InvoiceStorage:
         return self.path(self.banks, "{0}.ini".format(name))
 
     def read_bank(self, name, extra_suffix=None):
-        data = ConfigParser()
+        data = RawConfigParser()
         data.read(self.bank_path(name))
         if extra_suffix:
             data.read(self.path(self.banks, "{0}-{1}.ini".format(name, extra_suffix)))
@@ -179,10 +179,10 @@ class InvoiceStorage:
         filename = self.bank_path(name)
         self.ensure_dir(filename)
         if os.path.exists(filename):
-            bank = ConfigParser()
+            bank = RawConfigParser()
             bank.read(filename)
         else:
-            bank = ConfigParser()
+            bank = RawConfigParser()
 
         if not bank.has_section("bank"):
             bank.add_section("bank")
@@ -212,7 +212,7 @@ class InvoiceStorage:
         if os.path.exists(filename):
             contact = self.parse_contact(key)
         else:
-            contact = ConfigParser()
+            contact = RawConfigParser()
 
         if not contact.has_section("contact"):
             contact.add_section("contact")
