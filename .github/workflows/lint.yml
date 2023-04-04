@@ -3,7 +3,7 @@ name: Lint
 on: [push, pull_request]
 
 jobs:
-  flake8:
+  ruff:
 
     runs-on: ubuntu-latest
 
@@ -16,16 +16,13 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v1
         with:
-          python-version: 3.8
+          python-version: 3.11
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip wheel
           pip install -r requirements-test.txt
-      - name: Run flake8
-        run: |
-          echo "::add-matcher::.github/matchers/flake8.json"
-          pre-commit run flake8 --all
-          echo "::remove-matcher owner=flake8::"
+      - name: Run ruff
+        run: pre-commit run ruff --all
 
   pre-commit:
 
@@ -40,7 +37,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v1
         with:
-          python-version: 3.8
+          python-version: 3.11
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip wheel
