@@ -74,26 +74,23 @@ class InvoiceStorage:
     def glob(self, year=None, month=None):
         if year:
             full_year = str(year)
-            year = "{:02d}".format(year % 2000)
+            year = f"{year % 2000:02d}"
         else:
             full_year = "[0-9][0-9][0-9][0-9]"
             year = "[0-9][0-9]"
-        if month:
-            month = "{:02d}".format(month)
-        else:
-            month = "[0-9][0-9]"
+        month = f"{month:02d}" if month else "[0-9][0-9]"
         mask = self.template.format(
             year=year, month=month, order="*", full_year=full_year
         )
         return sorted(glob(self.path(self.data, mask)))
 
-    def list(self, year=None, month=None):
+    def list(self, year=None, month=None):  # noqa: A003
         for filename in self.glob(year, month):
             yield self.base(self, filename)
 
     def get(self, invoice):
         if "/" not in invoice:
-            return self.base(self, self.path(self.data, "{}.ini".format(invoice)))
+            return self.base(self, self.path(self.data, f"{invoice}.ini"))
         return self.base(self, self.path(invoice))
 
     @cached_property
@@ -154,7 +151,7 @@ class InvoiceStorage:
             return filename
 
     def contact_path(self, name):
-        return self.path(self.contacts, "{0}.ini".format(name))
+        return self.path(self.contacts, f"{name}.ini")
 
     def parse_contact(self, name):
         data = RawConfigParser()
@@ -166,13 +163,13 @@ class InvoiceStorage:
         return dict(data["contact"])
 
     def bank_path(self, name):
-        return self.path(self.banks, "{0}.ini".format(name))
+        return self.path(self.banks, f"{name}.ini")
 
     def read_bank(self, name, extra_suffix=None):
         data = RawConfigParser()
         data.read(self.bank_path(name))
         if extra_suffix:
-            data.read(self.path(self.banks, "{0}-{1}.ini".format(name, extra_suffix)))
+            data.read(self.path(self.banks, f"{name}-{extra_suffix}.ini"))
         return dict(data["bank"])
 
     def update_bank(self, name, **kwargs):
@@ -194,7 +191,7 @@ class InvoiceStorage:
             bank.write(handle)
         return filename
 
-    def update_contact(
+    def update_contact(  # noqa: PLR0913
         self,
         key,
         name,

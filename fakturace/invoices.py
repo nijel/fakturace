@@ -77,20 +77,20 @@ class Invoice:
             self.invoice["rows_data"].append(
                 {
                     "item": self.invoice["item" + suffix],
-                    "rate": "{0:.2f}".format(rate),
+                    "rate": f"{rate:.2f}",
                     "quantity": quantity,
-                    "total": "{0:.2f}".format(total),
+                    "total": f"{total:.2f}",
                     "currency": self.invoice["currency"],
                 }
             )
 
-        self.invoice["total"] = "{0:.2f}".format(total_sum)
+        self.invoice["total"] = f"{total_sum:.2f}"
 
         # Calculate VAT
         vat = int(self.invoice["vat"]) * total_sum / 100
         if int(self.invoice["vat"]):
-            self.invoice["total_vat"] = "{0:.2f}".format(vat)
-            self.invoice["total_sum"] = "{0:.2f}".format(total_sum + vat)
+            self.invoice["total_vat"] = f"{vat:.2f}"
+            self.invoice["total_sum"] = f"{total_sum + vat:.2f}"
         self.invoice["include_czk"] = bool(int(self.invoice["vat"])) and self.contact[
             "vat_reg"
         ].startswith("CZ")
@@ -99,16 +99,16 @@ class Invoice:
         if self.invoice["include_czk"]:
             rate = Rates.get(self.invoice["date"], self.currency)
             self.invoice["czk_rate"] = str(rate)
-            self.invoice["czk_total"] = "{0:.2f}".format(rate * total_sum)
-            self.invoice["czk_total_vat"] = "{0:.2f}".format(rate * vat)
-            self.invoice["czk_total_sum"] = "{0:.2f}".format(rate * (total_sum + vat))
+            self.invoice["czk_total"] = "{:.2f}".format(rate * total_sum)
+            self.invoice["czk_total_vat"] = "{:.2f}".format(rate * vat)
+            self.invoice["czk_total_sum"] = "{:.2f}".format(rate * (total_sum + vat))
 
         # Shorter summary for PDF title
         self.invoice["shortitem"] = self.invoice["item"].split(":")[0]
 
         remarks = []
         for pos in range(1, 10):
-            name = "remark_{}".format(pos)
+            name = f"remark_{pos}"
             if name not in self.invoice:
                 break
             remarks.append(self.invoice[name])
@@ -139,11 +139,11 @@ class Invoice:
 
     @cached_property
     def tex_path(self):
-        return self.storage.path(self.storage.tex, "{}.tex".format(self.invoiceid))
+        return self.storage.path(self.storage.tex, f"{self.invoiceid}.tex")
 
     @cached_property
     def pdf_path(self):
-        return self.storage.path(self.storage.pdf, "{}.pdf".format(self.invoiceid))
+        return self.storage.path(self.storage.pdf, f"{self.invoiceid}.pdf")
 
     def write_tex(self):
         row_template = self.storage.jinja.get_template(self.invoice["row"])
@@ -223,7 +223,7 @@ class Invoice:
 
     @cached_property
     def paid_path(self):
-        return self.storage.path(self.storage.data, "{}.paid".format(self.invoiceid))
+        return self.storage.path(self.storage.data, f"{self.invoiceid}.paid")
 
     def mark_paid(self, text):
         with open(self.paid_path, "w") as handle:

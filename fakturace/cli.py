@@ -10,12 +10,13 @@ COMMANDS = {}
 
 
 def register_command(command):
-    """Decorator to register command in command line interface."""
+    """Register a command in command line interface."""
     COMMANDS[command.__name__.lower()] = command
     return command
 
 
-class Command(object):
+class Command:
+
     """Basic command object."""
 
     def __init__(self, args):
@@ -36,12 +37,13 @@ class Command(object):
         return subparser.add_parser(cls.__name__.lower(), description=cls.__doc__)
 
     def run(self):
-        """Main execution of the command."""
+        """Execute the command."""
         raise NotImplementedError
 
 
 @register_command
 class List(Command):
+
     """List invoices."""
 
     @classmethod
@@ -71,32 +73,30 @@ class List(Command):
         )
 
     def run(self):
-        """Main execution of the command."""
+        """Execute the command."""
         total = 0
         for invoice in self.storage.list(self.args.year):
             if not self.match(invoice):
                 continue
-            if self.args.vat:
-                amount = invoice.amount_czk_vat
-            else:
-                amount = invoice.amount_czk
+            amount = invoice.amount_czk_vat if self.args.vat else invoice.amount_czk
             print(
-                "{0}: {1} {2} ({4:.2f} CZK): {3} [{5}]".format(
+                "{}: {} {} ({:.2f} CZK): {} [{}]".format(
                     invoice.invoiceid,
                     invoice.amount,
                     invoice.currency,
-                    invoice.invoice["item"],
                     amount,
+                    invoice.invoice["item"],
                     invoice.contact["name"],
                 )
             )
             total += amount
         print()
-        print("Total: {0:.2f} CZK".format(total))
+        print(f"Total: {total:.2f} CZK")
 
 
 @register_command
 class NotPaid(List):
+
     """Not paid invoices."""
 
     def match(self, invoice):
@@ -105,6 +105,7 @@ class NotPaid(List):
 
 @register_command
 class Detail(Command):
+
     """Show invoice detail."""
 
     @classmethod
@@ -115,7 +116,7 @@ class Detail(Command):
         return parser
 
     def run(self):
-        """Main execution of the command."""
+        """Execute the command."""
         invoice = self.storage.get(self.args.id)
         print(invoice.invoiceid)
         print("-" * len(invoice.invoiceid))
@@ -127,10 +128,10 @@ class Detail(Command):
         print("Country:  ", invoice.contact["country"])
         print("Item:     ", invoice.invoice["item"])
         print("Category: ", invoice.invoice["category"])
-        print("Rate:      {0} {1}".format(invoice.rate, invoice.currency))
-        print("Quantity:  {0}".format(invoice.quantity))
-        print("Amount:    {0} {1}".format(invoice.amount, invoice.currency))
-        print("Amount:    {0:.2f} CZK incl. VAT".format(invoice.amount_czk))
+        print(f"Rate:      {invoice.rate} {invoice.currency}")
+        print(f"Quantity:  {invoice.quantity}")
+        print(f"Amount:    {invoice.amount} {invoice.currency}")
+        print(f"Amount:    {invoice.amount_czk:.2f} CZK incl. VAT")
         if invoice.paid():
             print("Paid:      yes")
         else:
@@ -139,26 +140,29 @@ class Detail(Command):
 
 @register_command
 class WriteTex(Detail):
+
     """Generate tex."""
 
     def run(self):
-        """Main execution of the command."""
+        """Execute the command."""
         invoice = self.storage.get(self.args.id)
         invoice.write_tex()
 
 
 @register_command
 class BuildPDF(Detail):
+
     """Build PDF."""
 
     def run(self):
-        """Main execution of the command."""
+        """Execute the command."""
         invoice = self.storage.get(self.args.id)
         invoice.build_pdf()
 
 
 @register_command
 class Summary(Command):
+
     """Show invoice summary."""
 
     @classmethod
@@ -181,9 +185,9 @@ class Summary(Command):
         supertotal = 0
         year = self.args.year
         supercats = {x: 0 for x in categories}
-        catformat = " ".join(("{{{0}:7.0f}} CZK".format(x) for x in categories))
-        header = "Month         Total {0}".format(
-            " ".join(("{0:>11}".format(x.title()) for x in categories))
+        catformat = " ".join(f"{{{x}:7.0f}} CZK" for x in categories)
+        header = "Month         Total {}".format(
+            " ".join(f"{x.title():>11}" for x in categories)
         )
         print(header)
         print("-" * len(header))
@@ -191,34 +195,32 @@ class Summary(Command):
             total = 0
             cats = {x: 0 for x in categories}
             for invoice in self.storage.list(year, month):
-                if self.args.vat:
-                    amount = invoice.amount_czk_vat
-                else:
-                    amount = invoice.amount_czk
+                amount = invoice.amount_czk_vat if self.args.vat else invoice.amount_czk
                 cats[invoice.category] += amount
                 supercats[invoice.category] += amount
                 total += amount
                 supertotal += amount
             if self.args.summary:
                 print(
-                    "{0}/{1:02d} {2:7.0f} CZK {3}".format(
+                    "{}/{:02d} {:7.0f} CZK {}".format(
                         year, month, supertotal, catformat.format(**supercats)
                     )
                 )
             else:
                 print(
-                    "{0}/{1:02d} {2:7.0f} CZK {3}".format(
+                    "{}/{:02d} {:7.0f} CZK {}".format(
                         year, month, total, catformat.format(**cats)
                     )
                 )
         print("-" * len(header))
         print(
-            "Summary {0:7.0f} CZK {1}".format(supertotal, catformat.format(**supercats))
+            "Summary {:7.0f} CZK {}".format(supertotal, catformat.format(**supercats))
         )
 
 
 @register_command
 class Add(Command):
+
     """Create new invoice."""
 
     @classmethod
@@ -245,7 +247,7 @@ class Add(Command):
             if self.args.skip_validation:
                 vatin.verify()
             elif not vatin.data.valid:
-                raise Exception("Invalid VAT: {}".format(vat_reg))
+                raise ValueError(f"Invalid VAT: {vat_reg}")
 
         filename = self.storage.create(self.args.contact)
         print(filename)
@@ -254,11 +256,10 @@ class Add(Command):
 
 
 def main(args=None):
-    """Execution entry point."""
-
+    """CLI entry point."""
     parser = ArgumentParser(
         description="Fakturace.",
-        epilog="This utility is developed at <{0}>.".format(
+        epilog="This utility is developed at <{}>.".format(
             "https://github.com/nijel/fakturace"
         ),
     )

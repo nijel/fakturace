@@ -12,11 +12,11 @@ class Rates:
     def download(cls, date):
         if not os.path.exists(CACHE_DIR):
             os.makedirs(CACHE_DIR)
-        cache_file = os.path.join(CACHE_DIR, "rates-{0}".format(date))
+        cache_file = os.path.join(CACHE_DIR, f"rates-{date}")
 
         # Filesystem cache
         if date not in cls.datacache and os.path.exists(cache_file):
-            with open(cache_file, "r") as handle:
+            with open(cache_file) as handle:
                 cls.datacache[date] = json.load(handle)
 
         # Load remotely
