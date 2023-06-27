@@ -1,15 +1,16 @@
 import json
 import os
+from typing import ClassVar
 from urllib.request import urlopen
 
 from fakturace.data import CACHE_DIR, RATE_URL
 
 
 class Rates:
-    datacache = {}
+    datacache: ClassVar[dict[str, float]] = {}
 
     @classmethod
-    def download(cls, date):
+    def download(cls, date: str):
         if not os.path.exists(CACHE_DIR):
             os.makedirs(CACHE_DIR)
         cache_file = os.path.join(CACHE_DIR, f"rates-{date}")
@@ -40,7 +41,7 @@ class Rates:
         return cls.datacache[date]
 
     @classmethod
-    def get(cls, date, currency):
+    def get(cls, date: str, currency: str):
         if currency == "CZK":
             return 1
         rates = cls.download(date)
