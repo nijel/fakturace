@@ -208,13 +208,11 @@ class Summary(Command):
                 )
             else:
                 print(
-                    "{}/{:02d} {:7.0f} CZK {}".format(
-                        year, month, total, catformat.format(**cats)
-                    )
+                    f"{year}/{month:02d} {total:7.0f} CZK {catformat.format(**cats)}"
                 )
         print("-" * len(header))
         print(
-            "Summary {:7.0f} CZK {}".format(supertotal, catformat.format(**supercats))
+            f"Summary {supertotal:7.0f} CZK {catformat.format(**supercats)}"
         )
 
 
