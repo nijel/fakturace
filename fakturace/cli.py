@@ -207,13 +207,9 @@ class Summary(Command):
                     )
                 )
             else:
-                print(
-                    f"{year}/{month:02d} {total:7.0f} CZK {catformat.format(**cats)}"
-                )
+                print(f"{year}/{month:02d} {total:7.0f} CZK {catformat.format(**cats)}")
         print("-" * len(header))
-        print(
-            f"Summary {supertotal:7.0f} CZK {catformat.format(**supercats)}"
-        )
+        print(f"Summary {supertotal:7.0f} CZK {catformat.format(**supercats)}")
 
 
 @register_command
