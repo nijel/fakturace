@@ -246,7 +246,7 @@ class Add(Command):
         filename = self.storage.create(self.args.contact)
         print(filename)
         if self.args.edit:
-            subprocess.run(["gvim", filename])
+            subprocess.run(["gvim", filename], check=True)
 
 
 def main(args=None):
