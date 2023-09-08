@@ -20,12 +20,18 @@ LATEX_SUBS = (
     (re.compile(r"\.\.\.+"), r"\\ldots"),
 )
 
+DASH_RE = re.compile(r"-")
+
 
 def escape_tex(value):
     newval = value
     for pattern, replacement in LATEX_SUBS:
         newval = pattern.sub(replacement, newval)
     return newval
+
+
+def escape_dash(value):
+    return DASH_RE.sub(r"--", value)
 
 
 class InvoiceStorage:
@@ -61,6 +67,7 @@ class InvoiceStorage:
             loader=jinja2.FileSystemLoader(os.path.abspath(basedir)),
         )
         self.jinja.filters["escape_tex"] = escape_tex
+        self.jinja.filters["escape_dash"] = escape_dash
 
     @staticmethod
     def ensure_dir(filename):
