@@ -80,7 +80,7 @@ class Invoice:
                     "rate": f"{rate:.2f}",
                     "quantity": quantity,
                     "total": f"{total:.2f}",
-                    "currency": self.invoice["currency"],
+                    "currency": self.bank.get("currency", self.invoice["currency"]),
                 }
             )
 
