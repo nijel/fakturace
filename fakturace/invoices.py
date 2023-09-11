@@ -88,9 +88,8 @@ class Invoice:
 
         # Calculate VAT
         vat = int(self.invoice["vat"]) * total_sum / 100
-        if int(self.invoice["vat"]):
-            self.invoice["total_vat"] = f"{vat:.2f}"
-            self.invoice["total_sum"] = f"{total_sum + vat:.2f}"
+        self.invoice["total_vat"] = f"{vat:.2f}"
+        self.invoice["total_sum"] = f"{total_sum + vat:.2f}"
         self.invoice["include_czk"] = bool(int(self.invoice["vat"])) and self.contact[
             "vat_reg"
         ].startswith("CZ")
