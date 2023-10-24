@@ -2,7 +2,6 @@
 profile = "black"
 
 [tool.ruff]
-format = "github"
 ignore = [
   "D211",
   "D212",
@@ -10,6 +9,7 @@ ignore = [
   "T201",
   "TRY003"
 ]
+output-format = "github"
 select = [
   "E",
   "F",
