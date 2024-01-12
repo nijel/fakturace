@@ -95,6 +95,52 @@ class List(Command):
 
 
 @register_command
+class Contacts(Command):
+
+    """List invoices."""
+
+    @classmethod
+    def add_parser(cls, subparser):
+        """Create parser for command line."""
+        parser = super().add_parser(subparser)
+        parser.add_argument(
+            "--year",
+            type=int,
+            help="Year to process",
+            default=datetime.date.today().year,
+        )
+        parser.add_argument(
+            "--country",
+            help="Country to list",
+        )
+        parser.add_argument("match", nargs="?", help="Match string to find")
+        return parser
+
+    def match(self, invoice):
+        if self.args.country and self.args.country != invoice.contact["country"]:
+            return False
+        if not self.args.match:
+            return True
+        match = self.args.match.lower()
+        return (
+            match in invoice.invoice["item"].lower()
+            or match in invoice.invoice["contact"].lower()
+            or match in invoice.contact["name"].lower()
+        )
+
+    def run(self):
+        """Execute the command."""
+        contacts = {}
+        for invoice in self.storage.list(self.args.year):
+            if not self.match(invoice):
+                continue
+            contacts[invoice.contact["name"]] = invoice.contact
+
+        for contact in contacts.values():
+            print(f"{contact['name']}, {contact['city']}, {contact.get('email')}")
+
+
+@register_command
 class NotPaid(List):
 
     """Not paid invoices."""
