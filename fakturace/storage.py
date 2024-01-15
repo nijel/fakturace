@@ -91,7 +91,7 @@ class InvoiceStorage:
         )
         return sorted(glob(self.path(self.data, mask)))
 
-    def list(self, year=None, month=None):  # noqa: A003
+    def list(self, year=None, month=None):
         for filename in self.glob(year, month):
             yield self.base(self, filename)
 
