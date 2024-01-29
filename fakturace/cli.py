@@ -16,7 +16,6 @@ def register_command(command):
 
 
 class Command:
-
     """Basic command object."""
 
     def __init__(self, args):
@@ -43,7 +42,6 @@ class Command:
 
 @register_command
 class List(Command):
-
     """List invoices."""
 
     @classmethod
@@ -96,7 +94,6 @@ class List(Command):
 
 @register_command
 class Contacts(Command):
-
     """List invoices."""
 
     @classmethod
@@ -142,7 +139,6 @@ class Contacts(Command):
 
 @register_command
 class NotPaid(List):
-
     """Not paid invoices."""
 
     def match(self, invoice):
@@ -151,7 +147,6 @@ class NotPaid(List):
 
 @register_command
 class Detail(Command):
-
     """Show invoice detail."""
 
     @classmethod
@@ -186,7 +181,6 @@ class Detail(Command):
 
 @register_command
 class WriteTex(Detail):
-
     """Generate tex."""
 
     def run(self):
@@ -197,7 +191,6 @@ class WriteTex(Detail):
 
 @register_command
 class BuildPDF(Detail):
-
     """Build PDF."""
 
     def run(self):
@@ -208,7 +201,6 @@ class BuildPDF(Detail):
 
 @register_command
 class Summary(Command):
-
     """Show invoice summary."""
 
     @classmethod
@@ -260,7 +252,6 @@ class Summary(Command):
 
 @register_command
 class Add(Command):
-
     """Create new invoice."""
 
     @classmethod
