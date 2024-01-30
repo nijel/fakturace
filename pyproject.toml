@@ -3,49 +3,27 @@ profile = "black"
 
 [tool.ruff]
 ignore = [
+  "EM102",
+  "PERF401",
+  "UP007",
   "D211",
   "D212",
   "D10",
   "T201",
-  "TRY003"
+  "TRY003",
+  "PTH",
+  "ANN",
+  "DTZ011",
+  "EM101",
+  "S607",
+  "S603",
+  "S310",
+  "S701",
+  "S101"
 ]
 output-format = "github"
-select = [
-  "E",
-  "F",
-  "B",
-  "T10",
-  "A",
-  "C4",
-  "C90",
-  "YTT",
-  "DJ",
-  "UP",
-  "D",
-  "PD",
-  "PGH",
-  "PL",
-  "TRY",
-  "RUF",
-  "ERA",
-  "ICN",
-  "ISC",
-  "EXE",
-  "INP",
-  "PIE",
-  "G",
-  "PYI",
-  "Q",
-  "SIM",
-  "TID",
-  "RSE",
-  "T20",
-  "RET",
-  "SLF",
-  "N",
-  "I"
-]
-target-version = "py39"
+select = ["ALL"]
+target-version = "py311"
 
 [tool.ruff.mccabe]
 max-complexity = 16

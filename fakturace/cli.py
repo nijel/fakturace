@@ -57,7 +57,10 @@ class List(Command):
             default=datetime.date.today().year,
         )
         parser.add_argument(
-            "--vat", action="store_true", help="Include VAT", default=False
+            "--vat",
+            action="store_true",
+            help="Include VAT",
+            default=False,
         )
         parser.add_argument("match", nargs="?", help="Match string to find")
         return parser
@@ -87,7 +90,7 @@ class List(Command):
                     amount,
                     invoice.invoice["item"],
                     invoice.contact["name"],
-                )
+                ),
             )
             total += amount
         print()
@@ -221,7 +224,10 @@ class Summary(Command):
             default=datetime.date.today().year,
         )
         parser.add_argument(
-            "--vat", action="store_true", help="Include VAT", default=False
+            "--vat",
+            action="store_true",
+            help="Include VAT",
+            default=False,
         )
         parser.add_argument("--summary", "-s", action="store_true", help="show YTD sum")
         return parser
@@ -233,7 +239,7 @@ class Summary(Command):
         supercats = {x: 0 for x in categories}
         catformat = " ".join(f"{{{x}:7.0f}} CZK" for x in categories)
         header = "Month         Total {}".format(
-            " ".join(f"{x.title():>11}" for x in categories)
+            " ".join(f"{x.title():>11}" for x in categories),
         )
         print(header)
         print("-" * len(header))
@@ -249,8 +255,11 @@ class Summary(Command):
             if self.args.summary:
                 print(
                     "{}/{:02d} {:7.0f} CZK {}".format(
-                        year, month, supertotal, catformat.format(**supercats)
-                    )
+                        year,
+                        month,
+                        supertotal,
+                        catformat.format(**supercats),
+                    ),
                 )
             else:
                 print(f"{year}/{month:02d} {total:7.0f} CZK {catformat.format(**cats)}")
@@ -300,15 +309,19 @@ def main(args=None):
     parser = ArgumentParser(
         description="Fakturace.",
         epilog="This utility is developed at <{}>.".format(
-            "https://github.com/nijel/fakturace"
+            "https://github.com/nijel/fakturace",
         ),
     )
     parser.add_argument(
-        "--quotes", action="store_true", help="Operate on quotes instead of invoices"
+        "--quotes",
+        action="store_true",
+        help="Operate on quotes instead of invoices",
     )
     parser.add_argument("--web", action="store_true", help="Operate on web invoices")
     parser.add_argument(
-        "--proforma", action="store_true", help="Operate on proforma invoices"
+        "--proforma",
+        action="store_true",
+        help="Operate on proforma invoices",
     )
 
     subparser = parser.add_subparsers(dest="cmd")

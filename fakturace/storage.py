@@ -87,7 +87,10 @@ class InvoiceStorage:
             year = "[0-9][0-9]"
         month = f"{month:02d}" if month else "[0-9][0-9]"
         mask = self.template.format(
-            year=year, month=month, order="*", full_year=full_year
+            year=year,
+            month=month,
+            order="*",
+            full_year=full_year,
         )
         return sorted(glob(self.path(self.data, mask)))
 

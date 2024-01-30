@@ -34,7 +34,8 @@ class Invoice:
         self.process_defaults()
 
         self.bank = self.storage.read_bank(
-            self.invoice["currency"], self.invoice["bank_suffix"]
+            self.invoice["currency"],
+            self.invoice["bank_suffix"],
         )
         # Propagate defaults from bank
         for field in ("template", "note", "vat"):
@@ -81,7 +82,7 @@ class Invoice:
                     "quantity": quantity,
                     "total": f"{total:.2f}",
                     "currency": self.bank.get("currency", self.invoice["currency"]),
-                }
+                },
             )
 
         self.invoice["total"] = f"{total_sum:.2f}"
@@ -148,7 +149,8 @@ class Invoice:
         row_template = self.storage.jinja.get_template(self.invoice["row"])
 
         category_template = self.invoice["template"].replace(
-            ".tex", f"-{self.category}.tex"
+            ".tex",
+            f"-{self.category}.tex",
         )
 
         try:

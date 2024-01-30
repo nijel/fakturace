@@ -35,5 +35,5 @@ setup(
         "Topic :: Utilities",
     ],
     entry_points={"console_scripts": ["fakturace = fakturace.cli:main"]},
-    python_requires=">=3.9",
+    python_requires=">=3.11",
 )
