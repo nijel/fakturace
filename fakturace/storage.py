@@ -1,9 +1,10 @@
+from __future__ import annotations
+
 import datetime
 import os
 import re
 from configparser import RawConfigParser
 from glob import glob
-from typing import Optional
 
 import jinja2
 from django.utils.functional import cached_property
@@ -129,7 +130,7 @@ class InvoiceStorage:
             return filename
         raise ValueError("Failed to find invoice number!")
 
-    def create(self, contact, duedelta: Optional[int] = None, **kwargs):
+    def create(self, contact, duedelta: int | None = None, **kwargs):
         if duedelta is None:
             duedelta = self.default_due
         with self.lock:

@@ -4,8 +4,6 @@ profile = "black"
 [tool.ruff]
 ignore = [
   "EM102",
-  "PERF401",
-  "UP007",
   "D211",
   "D212",
   "D10",

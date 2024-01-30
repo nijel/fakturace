@@ -158,9 +158,7 @@ class Invoice:
         except TemplateNotFound:
             template = self.storage.jinja.get_template(self.invoice["template"])
 
-        rows = []
-        for row in self.invoice["rows_data"]:
-            rows.append(row_template.render(row))
+        rows = [row_template.render(row) for row in self.invoice["rows_data"]]
 
         context = {"invoiceid": self.invoiceid, "rows": "\n".join(rows)}
         context.update(self.contact)
