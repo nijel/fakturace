@@ -228,7 +228,7 @@ class Summary(Command):
         categories = self.storage.settings["categories"].split(",")
         supertotal = 0
         year = self.args.year
-        supercats = {x: 0 for x in categories}
+        supercats = dict.fromkeys(categories, 0)
         cat_format = " ".join(f"{{{x}:7.0f}} CZK" for x in categories)
         header = "Month         Total {}".format(
             " ".join(f"{x.title():>11}" for x in categories),
@@ -237,7 +237,7 @@ class Summary(Command):
         print("-" * len(header))
         for month in range(1, 13):
             total = 0
-            cats = {x: 0 for x in categories}
+            cats = dict.fromkeys(categories, 0)
             for invoice in self.storage.list(year, month):
                 amount = invoice.amount_czk_vat if self.args.vat else invoice.amount_czk
                 cats[invoice.category] += amount
