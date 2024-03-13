@@ -237,7 +237,7 @@ class Summary(Command):
         supertotal = 0
         year = self.args.year
         supercats = {x: 0 for x in categories}
-        catformat = " ".join(f"{{{x}:7.0f}} CZK" for x in categories)
+        cat_format = " ".join(f"{{{x}:7.0f}} CZK" for x in categories)
         header = "Month         Total {}".format(
             " ".join(f"{x.title():>11}" for x in categories),
         )
@@ -253,18 +253,14 @@ class Summary(Command):
                 total += amount
                 supertotal += amount
             if self.args.summary:
-                print(
-                    "{}/{:02d} {:7.0f} CZK {}".format(
-                        year,
-                        month,
-                        supertotal,
-                        catformat.format(**supercats),
-                    ),
-                )
+                display_total = supertotal
+                cat_sums = cat_format.format(**supercats)
             else:
-                print(f"{year}/{month:02d} {total:7.0f} CZK {catformat.format(**cats)}")
+                display_total = total
+                cat_sums = cat_format.format(**cats)
+            print(f"{year}/{month:02d} {display_total:7.0f} CZK {cat_sums}")
         print("-" * len(header))
-        print(f"Summary {supertotal:7.0f} CZK {catformat.format(**supercats)}")
+        print(f"Summary {supertotal:7.0f} CZK {cat_format.format(**supercats)}")
 
 
 @register_command
