@@ -41,8 +41,7 @@ class Command:
         raise NotImplementedError
 
 
-@register_command
-class List(Command):
+class FilterCommand(Command):
     """List invoices."""
 
     @classmethod
@@ -81,12 +80,20 @@ class List(Command):
             or match in invoice.contact["name"].lower()
         )
 
+    def list(self):
+        for invoice in self.storage.list(self.args.year):
+            if self.match(invoice):
+                yield invoice
+
+
+@register_command
+class List(FilterCommand):
+    """List invoices."""
+
     def run(self):
         """Execute the command."""
         total = 0
-        for invoice in self.storage.list(self.args.year):
-            if not self.match(invoice):
-                continue
+        for invoice in self.list():
             amount = invoice.amount_czk_vat if self.args.vat else invoice.amount_czk
             print(
                 "{}: {} {} ({:.2f} CZK): {} [{}]".format(
