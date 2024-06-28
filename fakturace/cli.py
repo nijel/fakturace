@@ -2,6 +2,7 @@ import datetime
 import subprocess
 from argparse import ArgumentParser
 from fnmatch import fnmatch
+from xml.etree import ElementTree
 
 from vies.types import VATIN
 
@@ -108,6 +109,79 @@ class List(FilterCommand):
             total += amount
         print()
         print(f"Total: {total:.2f} CZK")
+
+
+@register_command
+class XMLExport(FilterCommand):
+    """XML exportinvoices."""
+
+    def add_element(self, root, name: str, text: str | None = None):
+        added = ElementTree.SubElement(root, name)
+        if text is not None:
+            added.text = text
+        return added
+
+    def add_amounts(self, root, invoice):
+        self.add_element(root, "Celkem", invoice.invoice["total_sum"])
+        dph = self.add_element(root, "SouhrnDPH")
+        if invoice.invoice["vat"] in {0, 5, 22}:
+            self.add_element(
+                dph, f"Zaklad{invoice.invoice['vat']}", invoice.invoice["total"]
+            )
+            self.add_element(
+                dph, f"DPH{invoice.invoice['vat']}", invoice.invoice["total_vat"]
+            )
+        else:
+            dalsi = self.add_element(dph, "SeznamDalsiSazby")
+            sazba = self.add_element(dalsi, "DalsiSazba")
+            self.add_element(sazba, "Sazba", invoice.invoice["vat"])
+            self.add_element(sazba, "Zaklad", invoice.invoice["total"])
+            self.add_element(sazba, "DPH", invoice.invoice["total_vat"])
+
+    def run(self):
+        """Execute the command."""
+        document = ElementTree.Element("MoneyData")
+        invoices = ElementTree.SubElement(document, "SeznamFaktVyd")
+
+        for invoice in self.list():
+            output = ElementTree.SubElement(invoices, "FaktVyd")
+            self.add_element(output, "Doklad", invoice.invoiceid)
+            self.add_element(output, "Vystaveno", invoice.invoice["date"])
+            self.add_element(output, "Splatno", invoice.invoice["due"])
+            self.add_element(output, "Popis", invoice.invoice["item"])
+            if invoice.currency != "CZK":
+                valuty = self.add_element(output, "Valuty")
+                mena = self.add_element(valuty, "Mena")
+                self.add_element(mena, "Kod", "EUR")
+                self.add_amounts(valuty, invoice)
+            else:
+                self.add_amounts(output, invoice)
+
+            prijemce = self.add_element(output, "KonecPrij")
+            self.add_element(prijemce, "Nazev", invoice.contact["name"])
+            adresa = self.add_element(prijemce, "Adresa")
+            self.add_element(adresa, "Ulice", invoice.contact["address"])
+            self.add_element(adresa, "Misto", invoice.contact["city"])
+            self.add_element(adresa, "Stat", invoice.contact["country"])
+            if invoice.contact["tax_reg"] and invoice.contact["vat_reg"].startswith(
+                "CZ"
+            ):
+                self.add_element(prijemce, "ICO", invoice.contact["tax_reg"])
+            if invoice.contact["vat_reg"]:
+                self.add_element(prijemce, "DIC", invoice.contact["vat_reg"])
+
+            seznam = self.add_element(output, "SeznamPolozek")
+            for row in invoice.invoice["rows_data"]:
+                polozka = self.add_element(seznam, "Polozka")
+                self.add_element(polozka, "Popis", row["item"])
+                self.add_element(polozka, "PocetMJ", row["quantity"])
+                if invoice.currency == "CZK":
+                    self.add_element(polozka, "Cena", row["total"])
+                else:
+                    self.add_element(polozka, "Valuty", row["total"])
+
+        ElementTree.indent(document)
+        ElementTree.dump(document)
 
 
 @register_command
