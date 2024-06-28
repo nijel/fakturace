@@ -1,6 +1,7 @@
 import datetime
 import subprocess
 from argparse import ArgumentParser
+from fnmatch import fnmatch
 
 from vies.types import VATIN
 
@@ -55,6 +56,10 @@ class List(Command):
             default=datetime.date.today().year,
         )
         parser.add_argument(
+            "--filter",
+            help="Filter by ID",
+        )
+        parser.add_argument(
             "--vat",
             action="store_true",
             help="Include VAT",
@@ -64,6 +69,9 @@ class List(Command):
         return parser
 
     def match(self, invoice):
+        if self.args.filter and not fnmatch(invoice.invoiceid, self.args.filter):
+            return False
+
         if not self.args.match:
             return True
         match = self.args.match.lower()
