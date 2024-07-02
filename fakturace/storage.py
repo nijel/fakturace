@@ -195,8 +195,8 @@ class InvoiceStorage:
         if not bank.has_section("bank"):
             bank.add_section("bank")
 
-        for name, value in kwargs.items():
-            bank.set("bank", name, value)
+        for key, value in kwargs.items():
+            bank.set("bank", key, value)
 
         with open(filename, "w") as handle:
             bank.write(handle)
