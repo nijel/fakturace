@@ -96,12 +96,11 @@ class Invoice:
         ].startswith("CZ")
 
         # Rates in CZK
-        if self.invoice["include_czk"]:
-            rate = Rates.get(self.invoice["date"], self.currency)
-            self.invoice["czk_rate"] = str(rate)
-            self.invoice["czk_total"] = f"{rate * total_sum:.2f}"
-            self.invoice["czk_total_vat"] = f"{rate * vat:.2f}"
-            self.invoice["czk_total_sum"] = f"{rate * (total_sum + vat):.2f}"
+        rate = Rates.get(self.invoice["date"], self.currency)
+        self.invoice["czk_rate"] = str(rate)
+        self.invoice["czk_total"] = f"{rate * total_sum:.2f}"
+        self.invoice["czk_total_vat"] = f"{rate * vat:.2f}"
+        self.invoice["czk_total_sum"] = f"{rate * (total_sum + vat):.2f}"
 
         # Shorter summary for PDF title
         self.invoice["shortitem"] = self.invoice["item"].split(":")[0]

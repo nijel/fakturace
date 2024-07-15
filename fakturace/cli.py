@@ -121,24 +121,33 @@ class XMLExport(FilterCommand):
             added.text = text
         return added
 
-    def add_amounts(self, root, invoice):
-        self.add_element(root, "Celkem", invoice.invoice["total_sum"])
+    def add_amounts(self, root, invoice, prefix: str = ""):
         dph = self.add_element(root, "SouhrnDPH")
-        if invoice.invoice["vat"] in {0, 5, 22}:
+        vat_rate = int(invoice.invoice["vat"])
+        fixed_rates = {0, 5, 22}
+        if vat_rate in fixed_rates:
             self.add_element(
-                dph, f"Zaklad{invoice.invoice['vat']}", invoice.invoice["total"]
+                dph, f"Zaklad{vat_rate}", invoice.invoice[f"{prefix}total"]
             )
-            self.add_element(
-                dph, f"DPH{invoice.invoice['vat']}", invoice.invoice["total_vat"]
-            )
+            if vat_rate > 0:
+                self.add_element(
+                    dph, f"DPH{vat_rate}", invoice.invoice[f"{prefix}total_vat"]
+                )
+            fixed_rates.remove(vat_rate)
+            for rate in fixed_rates:
+                self.add_element(dph, f"Zaklad{rate}", "0")
+            for rate in fixed_rates:
+                if rate > 0:
+                    self.add_element(dph, f"DPH{rate}", "0")
         else:
             dalsi = self.add_element(dph, "SeznamDalsiSazby")
             sazba = self.add_element(dalsi, "DalsiSazba")
             self.add_element(sazba, "Sazba", invoice.invoice["vat"])
-            self.add_element(sazba, "Zaklad", invoice.invoice["total"])
-            self.add_element(sazba, "DPH", invoice.invoice["total_vat"])
+            self.add_element(sazba, "Zaklad", invoice.invoice[f"{prefix}total"])
+            self.add_element(sazba, "DPH", invoice.invoice[f"{prefix}total_vat"])
+        self.add_element(root, "Celkem", invoice.invoice[f"{prefix}total_sum"])
 
-    def run(self):
+    def run(self):  # noqa: PLR0915
         """Execute the command."""
         document = ElementTree.Element("MoneyData")
         invoices = ElementTree.SubElement(document, "SeznamFaktVyd")
@@ -146,29 +155,64 @@ class XMLExport(FilterCommand):
         for invoice in self.list():
             output = ElementTree.SubElement(invoices, "FaktVyd")
             self.add_element(output, "Doklad", invoice.invoiceid)
-            self.add_element(output, "Vystaveno", invoice.invoice["date"])
-            self.add_element(output, "Splatno", invoice.invoice["due"])
+            self.add_element(output, "CisRada", "0")
             self.add_element(output, "Popis", invoice.invoice["item"])
+            self.add_element(output, "Vystaveno", invoice.invoice["date"])
+            self.add_element(output, "DatUcPr", invoice.invoice["date"])
+            self.add_element(output, "PlnenoDPH", invoice.invoice["date"])
+            self.add_element(output, "Splatno", invoice.invoice["due"])
+            self.add_element(output, "DatSkPoh", invoice.invoice["date"])
+            self.add_element(output, "KodDPH", "19Ř21")
+            self.add_element(output, "ZjednD", "0")
+            self.add_element(output, "VarSymbol", invoice.invoiceid)
+
+            # Druh (N: normální, L: zálohová, F: proforma, D: doklad k přijaté platbě)
+            self.add_element(output, "Druh", "N")
+            self.add_element(
+                output,
+                "Dobropis",
+                "0" if float(invoice.invoice["total_sum"]) > 0 else "1",
+            )
+            self.add_element(output, "ZpVypDPH", "1")
+            self.add_element(output, "SazbaDPH1", "12")
+            self.add_element(output, "SazbaDPH2", "21")
+            self.add_element(output, "Proplatit", invoice.invoice["czk_total_sum"])
+            self.add_element(output, "Vyuctovano", "0")
+            self.add_amounts(output, invoice, "czk_")
             if invoice.currency != "CZK":
                 valuty = self.add_element(output, "Valuty")
                 mena = self.add_element(valuty, "Mena")
                 self.add_element(mena, "Kod", "EUR")
+                self.add_element(mena, "Mnozstvi", "1")
+                self.add_element(mena, "Kurs", invoice.invoice["czk_rate"])
                 self.add_amounts(valuty, invoice)
-            else:
-                self.add_amounts(output, invoice)
 
-            prijemce = self.add_element(output, "KonecPrij")
-            self.add_element(prijemce, "Nazev", invoice.contact["name"])
-            adresa = self.add_element(prijemce, "Adresa")
+            self.add_element(output, "PriUhrZbyv", "0")
+            if invoice.currency != "CZK":
+                self.add_element(output, "ValutyProp", invoice.invoice["total_sum"])
+            self.add_element(output, "SumZaloha", "0")
+            self.add_element(output, "SumZalohaC", "0")
+
+            prijemce = self.add_element(output, "DodOdb")
+            self.add_element(prijemce, "ObchNazev", invoice.contact["name"])
+            adresa = self.add_element(prijemce, "ObchAdresa")
             self.add_element(adresa, "Ulice", invoice.contact["address"])
             self.add_element(adresa, "Misto", invoice.contact["city"])
             self.add_element(adresa, "Stat", invoice.contact["country"])
+            self.add_element(prijemce, "FaktNazev", invoice.contact["name"])
             if invoice.contact["tax_reg"] and invoice.contact["vat_reg"].startswith(
                 "CZ"
             ):
                 self.add_element(prijemce, "ICO", invoice.contact["tax_reg"])
             if invoice.contact["vat_reg"]:
                 self.add_element(prijemce, "DIC", invoice.contact["vat_reg"])
+            adresa = self.add_element(prijemce, "FaktAdresa")
+            self.add_element(adresa, "Ulice", invoice.contact["address"])
+            self.add_element(adresa, "Misto", invoice.contact["city"])
+            self.add_element(adresa, "Stat", invoice.contact["country"])
+            if invoice.contact["vat_reg"]:
+                self.add_element(prijemce, "PlatceDPH", "1")
+                self.add_element(prijemce, "FyzOsoba", "0")
 
             seznam = self.add_element(output, "SeznamPolozek")
             for row in invoice.invoice["rows_data"]:
