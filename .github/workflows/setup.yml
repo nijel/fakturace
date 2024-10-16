@@ -12,10 +12,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - uses: actions/cache@v1
-      with:
-        path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-setup-${{ hashFiles('**/requirements*.txt') }}
     - name: Setup Python
       uses: actions/setup-python@v5
       with:
