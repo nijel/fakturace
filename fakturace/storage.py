@@ -171,7 +171,10 @@ class InvoiceStorage:
 
     def read_contact(self, name):
         data = self.parse_contact(name)
-        return dict(data["contact"])
+        try:
+            return dict(data["contact"])
+        except KeyError as error:
+            raise ValueError(f"Contact {name} not found!") from error
 
     def bank_path(self, name):
         return self.path(self.banks, f"{name}.ini")
@@ -181,7 +184,10 @@ class InvoiceStorage:
         data.read(self.bank_path(name))
         if extra_suffix:
             data.read(self.path(self.banks, f"{name}-{extra_suffix}.ini"))
-        return dict(data["bank"])
+        try:
+            return dict(data["bank"])
+        except KeyError as error:
+            raise ValueError(f"Bank account {name} not found!") from error
 
     def update_bank(self, name, **kwargs):
         filename = self.bank_path(name)
