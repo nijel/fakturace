@@ -20,7 +20,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - uses: astral-sh/setup-uv@v3
     - name: Install pip dependencies
-      run: uv pip install -r requirements.txt -r requirements-test.txt psycopg2-binary
+      run: uv pip install --system -r requirements.txt -r requirements-test.txt psycopg2-binary
     - name: Test
       run: py.test --cov=fakturace fakturace
     - name: Coverage
