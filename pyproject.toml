@@ -2,7 +2,6 @@
 profile = "black"
 
 [tool.ruff]
-output-format = "github"
 target-version = "py311"
 
 [tool.ruff.lint]

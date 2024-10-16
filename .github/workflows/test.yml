@@ -14,25 +14,17 @@ jobs:
     name: Python ${{ matrix.python-version }}
     steps:
     - uses: actions/checkout@v2
-    - name: Cache pip
-      uses: actions/cache@v1
-      with:
-        path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('**/requirements*.txt') }}
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v1
       with:
         python-version: ${{ matrix.python-version }}
+    - uses: astral-sh/setup-uv@v3
     - name: Install pip dependencies
-      run: |
-        python -m pip install --upgrade pip wheel
-        pip install -r requirements.txt -r requirements-test.txt psycopg2-binary
+      run: uv pip install -r requirements.txt -r requirements-test.txt psycopg2-binary
     - name: Test
-      run: |
-        py.test --cov=fakturace fakturace
+      run: py.test --cov=fakturace fakturace
     - name: Coverage
-      run: |
-        coverage xml
+      run: coverage xml
     - uses: codecov/codecov-action@v1
       with:
         token: ${{secrets.CODECOV_TOKEN}}
