@@ -27,7 +27,7 @@ jobs:
       run: py.test --cov=fakturace fakturace
     - name: Coverage
       run: coverage xml
-    - uses: codecov/codecov-action@v1
+    - uses: codecov/codecov-action@v4
       with:
         token: ${{secrets.CODECOV_TOKEN}}
         flags: unittests
