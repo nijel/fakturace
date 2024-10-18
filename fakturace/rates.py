@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import json
 import os
 from decimal import Decimal
@@ -18,7 +20,7 @@ class DecimalRates:
     datacache: ClassVar[dict[str, float]] = {}
 
     @classmethod
-    def download(cls, date: str):
+    def download(cls, date: str) -> dict[str, dict[str, Decimal]]:
         if not os.path.exists(CACHE_DIR):
             os.makedirs(CACHE_DIR)
         cache_file = os.path.join(CACHE_DIR, f"rates-{date}")
@@ -52,7 +54,7 @@ class DecimalRates:
         return cls.datacache[date]
 
     @classmethod
-    def get(cls, date: str, currency: str):
+    def get(cls, date: str, currency: str) -> Decimal:
         if currency == "CZK":
             return 1
         rates = cls.download(date)
