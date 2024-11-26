@@ -445,8 +445,8 @@ def main(args=None):
     )
 
     subparser = parser.add_subparsers(dest="cmd")
-    for command in COMMANDS:
-        COMMANDS[command].add_parser(subparser)
+    for command in COMMANDS.values():
+        command.add_parser(subparser)
 
     params = parser.parse_args(args)
 
