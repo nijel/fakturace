@@ -20,7 +20,7 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
         allow-prereleases: true
-    - uses: astral-sh/setup-uv@v4
+    - uses: astral-sh/setup-uv@v5
     - name: Install pip dependencies
       run: uv pip install --system -r requirements.txt -r requirements-test.txt psycopg2-binary
     - name: Test
